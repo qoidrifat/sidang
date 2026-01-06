@@ -2,4 +2,3 @@ tensorflow
 gradio==4.44.1
 numpy
 pillow
-opencv-python-headless

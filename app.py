@@ -8,6 +8,8 @@ from PIL import Image
 # ==========================================
 
 # Definisi SE-Block (Wajib ada untuk load model Skenario 2)
+# Pastikan registrasi serializable agar aman
+@tf.keras.utils.register_keras_serializable()
 def squeeze_excite_block(input_tensor, ratio=16):
     filters = input_tensor.shape[-1]
     se = tf.keras.layers.GlobalAveragePooling2D()(input_tensor)
@@ -20,169 +22,127 @@ def squeeze_excite_block(input_tensor, ratio=16):
 # Dictionary untuk custom objects saat load model
 custom_objects_dict = {'squeeze_excite_block': squeeze_excite_block}
 
-# Label Kelas (Urutan sesuai training generator)
+# Label Kelas (Urutan sesuai dataset FER-2013 biasanya)
 LABELS = ['Marah 😡', 'Jijik 🤢', 'Takut 😱', 
           'Senang 😊', 'Sedih 😢', 'Terkejut 😲', 'Netral 😐']
 
 # ==========================================
-# 2. LOAD MODEL (CACHED)
+# 2. LOAD MODEL (DENGAN ERROR HANDLING)
 # ==========================================
 print("🔄 Sedang memuat model ke memori...")
 
-# Load Model 1: Baseline
-try:
-    model_s1 = tf.keras.models.load_model("model_scenario1.keras", compile=False)
-    print("✅ Model Skenario 1 (Baseline) Siap.")
-except Exception as e:
-    print(f"⚠️ Gagal load Model 1: {e}")
-    model_s1 = None
+def load_model_safely(path, custom_objs=None):
+    try:
+        model = tf.keras.models.load_model(path, custom_objects=custom_objs, compile=False)
+        print(f"✅ Berhasil load: {path}")
+        # Print input shape untuk debug
+        print(f"   Input Shape Model ini: {model.input_shape}")
+        return model
+    except Exception as e:
+        print(f"❌ Gagal load {path}: {e}")
+        return None
 
-# Load Model 2: Optimized (Proposed Method)
-try:
-    model_s2 = tf.keras.models.load_model(
-        "best_model_scenario2.keras", 
-        custom_objects=custom_objects_dict,
-        compile=False
-    )
-    print("✅ Model Skenario 2 (Optimized) Siap.")
-except Exception as e:
-    print(f"⚠️ Gagal load Model 2: {e}")
-    model_s2 = None
+# Load kedua model
+model_s1 = load_model_safely("model_scenario1.keras")
+model_s2 = load_model_safely("best_model_scenario2.keras", custom_objects_dict)
 
 # ==========================================
-# 3. LOGIKA PREDIKSI
+# 3. FUNGSI PREDIKSI PINTAR (SMART PREDICT)
 # ==========================================
+def preprocess_image(image, target_shape):
+    """
+    Menyesuaikan gambar input dengan shape yang diminta model.
+    target_shape format: (None, Height, Width, Channels)
+    """
+    if image is None: 
+        return None
+
+    # 1. Ambil target ukuran (H, W) dari model
+    # Jika model.input_shape = (None, 48, 48, 3), kita ambil (48, 48)
+    target_h, target_w = target_shape[1], target_shape[2]
+    target_channels = target_shape[3]
+
+    # 2. Resize Gambar
+    image_resized = image.resize((target_w, target_h))
+    img_array = np.array(image_resized)
+
+    # 3. Handling Channel (Grayscale vs RGB)
+    # Jika model minta 3 channel (RGB) tapi gambar Grayscale
+    if target_channels == 3 and len(img_array.shape) == 2:
+        img_array = np.stack((img_array,)*3, axis=-1)
+    
+    # Jika model minta 1 channel (Grayscale) tapi gambar RGB
+    elif target_channels == 1 and len(img_array.shape) == 3:
+        img_array = np.mean(img_array, axis=-1, keepdims=True)
+
+    # 4. Normalisasi (1./255) - Sesuai Notebook VGG16 umumnya
+    img_array = img_array.astype('float32') / 255.0
+    
+    # 5. Expand Dimension (Batch Size) -> (1, H, W, C)
+    img_array = np.expand_dims(img_array, axis=0)
+    
+    return img_array
+
 def predict_expression(image):
     if image is None:
         return None, None
     
-    # Preprocessing standar VGG16
-    image = image.resize((224, 224))
-    img_array = np.array(image)
-    
-    # Konversi Grayscale ke RGB jika perlu
-    if len(img_array.shape) == 2:
-        img_array = np.stack((img_array,)*3, axis=-1)
-        
-    img_array = img_array.astype('float32') / 255.0
-    img_array = np.expand_dims(img_array, axis=0)
-    
-    # Prediksi Skenario 1
+    # --- PREDIKSI SKENARIO 1 ---
     if model_s1:
-        pred_s1 = model_s1.predict(img_array)[0]
-        result_s1 = {LABELS[i]: float(pred_s1[i]) for i in range(len(LABELS))}
+        try:
+            # Preprocess dinamis sesuai input shape model 1
+            input_s1 = preprocess_image(image, model_s1.input_shape)
+            pred_s1 = model_s1.predict(input_s1, verbose=0)[0]
+            result_s1 = {LABELS[i]: float(pred_s1[i]) for i in range(len(LABELS))}
+        except Exception as e:
+            result_s1 = {f"Error: {str(e)}": 0.0}
     else:
-        result_s1 = {"Model Missing": 0.0}
+        result_s1 = {"Model 1 Tidak Ditemukan (Cek File)": 0.0}
 
-    # Prediksi Skenario 2
+    # --- PREDIKSI SKENARIO 2 ---
     if model_s2:
-        pred_s2 = model_s2.predict(img_array)[0]
-        result_s2 = {LABELS[i]: float(pred_s2[i]) for i in range(len(LABELS))}
+        try:
+            # Preprocess dinamis sesuai input shape model 2
+            input_s2 = preprocess_image(image, model_s2.input_shape)
+            pred_s2 = model_s2.predict(input_s2, verbose=0)[0]
+            result_s2 = {LABELS[i]: float(pred_s2[i]) for i in range(len(LABELS))}
+        except Exception as e:
+            result_s2 = {f"Error: {str(e)}": 0.0}
     else:
-        result_s2 = {"Model Missing": 0.0}
+        result_s2 = {"Model 2 Tidak Ditemukan (Cek File)": 0.0}
         
     return result_s1, result_s2
 
 # ==========================================
-# 4. ANTARMUKA (GEN Z / MODERN STYLE)
+# 4. ANTARMUKA MODERN
 # ==========================================
 
-# Custom CSS untuk tampilan minimalis & modern
 custom_css = """
-.gradio-container {
-    font-family: 'Inter', -apple-system, system-ui, sans-serif !important;
-}
-h1 {
-    text-align: center;
-    background: -webkit-linear-gradient(45deg, #6366f1, #a855f7);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-weight: 800 !important;
-    font-size: 2.5rem !important;
-    margin-bottom: 0.5rem !important;
-}
-.subtitle {
-    text-align: center;
-    color: #6b7280;
-    font-size: 1.1rem;
-    margin-bottom: 2rem;
-}
-.result-header {
-    font-weight: 600;
-    color: #374151;
-    margin-bottom: 0.5rem;
-    text-align: center;
-}
-.footer {
-    text-align: center;
-    margin-top: 2rem;
-    font-size: 0.8rem;
-    color: #9ca3af;
-}
+.gradio-container { font-family: 'Inter', sans-serif !important; }
+h1 { text-align: center; background: -webkit-linear-gradient(45deg, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; font-size: 2.5rem; }
+.subtitle { text-align: center; color: #6b7280; margin-bottom: 2rem; }
 """
 
-# Membangun UI dengan Theme Soft (Indigo)
 with gr.Blocks(theme=gr.themes.Soft(primary_hue="indigo", secondary_hue="zinc"), css=custom_css, title="Demo Sidang Skripsi") as demo:
     
-    # --- Header Section ---
     gr.Markdown("# ✨ Facial Expression Analysis ✨")
-    gr.Markdown("<div class='subtitle'>VGG16 Transfer Learning + Squeeze-Excitation Attention Mechanism</div>")
+    gr.Markdown("<div class='subtitle'>VGG16 Transfer Learning + Squeeze-Excitation (SE-Block)</div>")
     
-    # --- Main Content ---
     with gr.Row():
-        
-        # Kolom Kiri: Input
         with gr.Column(scale=1):
-            gr.Markdown("### 📸 Input Image")
-            input_image = gr.Image(
-                type="pil", 
-                label="Upload Wajah", 
-                sources=["upload", "clipboard", "webcam"],
-                height=350
-            )
+            input_image = gr.Image(type="pil", label="Upload Wajah", sources=["upload", "clipboard", "webcam"], height=350)
+            submit_btn = gr.Button("🚀 Analyze Expression", variant="primary")
             
-            with gr.Row():
-                clear_btn = gr.Button("Clear", variant="secondary")
-                submit_btn = gr.Button("🚀 Analyze Expression", variant="primary")
-            
-            gr.Markdown("""
-            **Petunjuk:**
-            1. Upload foto wajah yang jelas (frontal face).
-            2. Klik **Analyze Expression**.
-            3. Bandingkan hasil Baseline vs Optimized.
-            """)
-
-        # Kolom Kanan: Output Side-by-Side
         with gr.Column(scale=2):
-            gr.Markdown("### 📊 Comparative Results")
-            
             with gr.Row():
-                # Card Skenario 1
                 with gr.Column():
-                    gr.Markdown("<div class='result-header'>Skenario 1 (Baseline) ❄️</div>")
-                    gr.Markdown("*VGG16 Frozen, No Attention*")
-                    output_s1 = gr.Label(num_top_classes=4, label="Prediction Confidence")
-                
-                # Card Skenario 2 (Highlight)
+                    gr.Markdown("### Skenario 1 (Baseline) ❄️")
+                    output_s1 = gr.Label(num_top_classes=4, label="Confidence")
                 with gr.Column():
-                    gr.Markdown("<div class='result-header' style='color: #4f46e5;'>Skenario 2 (Optimized) 🔥</div>")
-                    gr.Markdown("*Fine-Tuned + SE-Block + Augmentasi*")
-                    output_s2 = gr.Label(num_top_classes=4, label="Prediction Confidence")
+                    gr.Markdown("### Skenario 2 (Optimized) 🔥")
+                    output_s2 = gr.Label(num_top_classes=4, label="Confidence")
     
-    # --- Footer ---
-    gr.Markdown("<div class='footer'>Developed by Qoid Rif'at | Universitas Trunojoyo Madura © 2025</div>")
+    submit_btn.click(fn=predict_expression, inputs=input_image, outputs=[output_s1, output_s2])
 
-    # --- Event Handlers ---
-    submit_btn.click(
-        fn=predict_expression, 
-        inputs=input_image, 
-        outputs=[output_s1, output_s2]
-    )
-    clear_btn.click(
-        lambda: (None, None, None), 
-        outputs=[input_image, output_s1, output_s2]
-    )
-
-# Jalankan Aplikasi
 if __name__ == "__main__":
     demo.launch()

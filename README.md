@@ -59,4 +59,3 @@ Sistem ini dibangun menggunakan pustaka utama berikut:
 ## **📄 Lisensi**
 
 Penelitian ini disusun untuk keperluan akademis di Universitas Trunojoyo Madura. Segala bentuk penggunaan ulang kode atau model harus mencantumkan sitasi yang sesuai.
-Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference

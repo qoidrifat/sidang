@@ -8,6 +8,8 @@ from PIL import Image
 # ==========================================
 
 # Definisi SE-Block (Wajib ada untuk load model Skenario 2)
+# Decorator ini penting agar TensorFlow mengenali fungsi ini saat serialisasi/deserialisasi
+@tf.keras.utils.register_keras_serializable()
 def squeeze_excite_block(input_tensor, ratio=16):
     filters = input_tensor.shape[-1]
     se = tf.keras.layers.GlobalAveragePooling2D()(input_tensor)
@@ -31,7 +33,9 @@ print("🔄 Sedang memuat model ke memori...")
 
 # Load Model 1: Baseline
 try:
-    model_s1 = tf.keras.models.load_model("model_scenario1.keras", compile=False)
+    # Gunakan CPU untuk menghindari error CUDA di Space basic jika GPU tidak tersedia
+    with tf.device('/CPU:0'):
+        model_s1 = tf.keras.models.load_model("model_scenario1.keras", compile=False)
     print("✅ Model Skenario 1 (Baseline) Siap.")
 except Exception as e:
     print(f"⚠️ Gagal load Model 1: {e}")
@@ -39,11 +43,12 @@ except Exception as e:
 
 # Load Model 2: Optimized (Proposed Method)
 try:
-    model_s2 = tf.keras.models.load_model(
-        "best_model_scenario2.keras", 
-        custom_objects=custom_objects_dict,
-        compile=False
-    )
+    with tf.device('/CPU:0'):
+        model_s2 = tf.keras.models.load_model(
+            "best_model_scenario2.keras", 
+            custom_objects=custom_objects_dict,
+            compile=False
+        )
     print("✅ Model Skenario 2 (Optimized) Siap.")
 except Exception as e:
     print(f"⚠️ Gagal load Model 2: {e}")
@@ -84,7 +89,7 @@ def predict_expression(image):
     return result_s1, result_s2
 
 # ==========================================
-# 4. ANTARMUKA (GEN Z / MODERN STYLE)
+# 4. ANTARMUKA (MODERN STYLE)
 # ==========================================
 
 # Custom CSS untuk tampilan minimalis & modern
@@ -119,6 +124,57 @@ h1 {
     font-size: 0.8rem;
     color: #9ca3af;
 }
+
+/* Styling untuk Info Proyek */
+.info-box {
+    background-color: #f8fafc;
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid #e2e8f0;
+    height: 100%;
+}
+.info-label {
+    font-weight: 600;
+    color: #64748b;
+    width: 100px;
+    display: inline-block;
+}
+.info-value {
+    color: #334155;
+    font-weight: 500;
+}
+
+/* Styling untuk Tabel Skenario */
+.scenario-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.scenario-table th {
+    background-color: #4f46e5;
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+}
+.scenario-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #e2e8f0;
+    color: #475569;
+}
+.scenario-table tr:last-child td {
+    border-bottom: none;
+}
+.scenario-table tr:nth-child(even) {
+    background-color: #f1f5f9;
+}
+.highlight-text {
+    color: #4f46e5;
+    font-weight: 700;
+}
 """
 
 # Membangun UI dengan Theme Soft (Indigo)
@@ -128,27 +184,59 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="indigo", secondary_hue="zinc"),
     gr.Markdown("# ✨ Facial Expression Analysis ✨")
     gr.Markdown("<div class='subtitle'>VGG16 Transfer Learning + Squeeze-Excitation Attention Mechanism</div>")
     
-    # --- INFO PROYEK (Dari README.md) ---
+    # --- INFO PROYEK (HTML Styled) ---
     with gr.Accordion("ℹ️ Informasi Peneliti & Skenario Pengujian", open=False):
         with gr.Row():
-            with gr.Column():
-                gr.Markdown("""
-                ### 👥 Identitas Peneliti
-                * **Nama:** Qoid Rif'at
-                * **NIM:** 210411100160
-                * **Instansi:** Universitas Trunojoyo Madura
-                * **Dospem 1:** Prof. Dr. Arif Muntasa, S.Si., M.T.
-                * **Dospem 2:** Fifin Ayu Mufarroha, M.Kom.
+            # Kolom Kiri: Kartu Identitas
+            with gr.Column(scale=2):
+                gr.HTML("""
+                <div class="info-box">
+                    <h3 style="margin-top:0; color: #4f46e5; margin-bottom: 15px;">👥 Identitas Peneliti</h3>
+                    <div style="margin-bottom: 8px;"><span class="info-label">Nama:</span> <span class="info-value">Qoid Rif'at</span></div>
+                    <div style="margin-bottom: 8px;"><span class="info-label">NIM:</span> <span class="info-value">210411100160</span></div>
+                    <div style="margin-bottom: 15px;"><span class="info-label">Instansi:</span> <span class="info-value">Universitas Trunojoyo Madura</span></div>
+                    <hr style="border: 0; border-top: 1px dashed #cbd5e1; margin: 10px 0;">
+                    <div style="margin-bottom: 8px;"><span class="info-label">Dospem 1:</span> <span class="info-value">Prof. Dr. Arif Muntasa, S.Si., M.T.</span></div>
+                    <div><span class="info-label">Dospem 2:</span> <span class="info-value">Fifin Ayu Mufarroha, M.Kom.</span></div>
+                </div>
                 """)
-            with gr.Column():
-                gr.Markdown("""
-                ### 🔬 Perbandingan Skenario
-                | Fitur | Skenario 1 (Baseline) | Skenario 2 (Optimized) |
-                | :--- | :--- | :--- |
-                | **Arsitektur** | VGG16 (Frozen) | VGG16 (Fine-Tuned) |
-                | **Integrasi** | - | **SE-Block Attention** |
-                | **Training** | Frozen Layers | Unfreeze Layer 11-19 |
-                | **Optimasi** | Tanpa Augmentasi | Augmentasi + Label Smooth |
+            
+            # Kolom Kanan: Tabel Perbandingan
+            with gr.Column(scale=3):
+                gr.HTML("""
+                <div class="info-box" style="padding: 0; border: none; background: transparent;">
+                    <table class="scenario-table">
+                        <thead>
+                            <tr>
+                                <th width="20%">Fitur</th>
+                                <th width="40%">Skenario 1 (Baseline)</th>
+                                <th width="40%">Skenario 2 (Optimized)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><b>Arsitektur</b></td>
+                                <td>VGG16 (Frozen Weights)</td>
+                                <td>VGG16 (Fine-Tuned)</td>
+                            </tr>
+                            <tr>
+                                <td><b>Integrasi</b></td>
+                                <td>-</td>
+                                <td class="highlight-text">SE-Block Attention</td>
+                            </tr>
+                            <tr>
+                                <td><b>Training</b></td>
+                                <td>Frozen Layers</td>
+                                <td>Unfreeze Layer 11-19</td>
+                            </tr>
+                            <tr>
+                                <td><b>Optimasi</b></td>
+                                <td>Tanpa Augmentasi</td>
+                                <td>Augmentasi + Label Smoothing</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
                 """)
 
     # --- Main Content ---
@@ -193,9 +281,8 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="indigo", secondary_hue="zinc"),
                     output_s2 = gr.Label(num_top_classes=4, label="Prediction Confidence")
     
     # --- Footer ---
-    gr.Markdown("<div class='footer'>Developed by Qoid Rif'at | 210411100160 </div>")
-    gr.Markdown("<div class='footer'>Universitas Trunojoyo Madura © 2025</div>")
-    
+    gr.Markdown("<div class='footer'>Developed by Qoid Rif'at | Universitas Trunojoyo Madura © 2025</div>")
+
     # --- Event Handlers ---
     submit_btn.click(
         fn=predict_expression, 
@@ -209,4 +296,5 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="indigo", secondary_hue="zinc"),
 
 # Jalankan Aplikasi
 if __name__ == "__main__":
-    demo.launch()
+    # ssr_mode=False menonaktifkan Server-Side Rendering yang sering konflik dengan TensorFlow di Spaces
+    demo.launch(ssr_mode=False)

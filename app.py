@@ -33,10 +33,10 @@ print("🔄 Sedang memuat model ke memori...")
 
 def load_model_safely(path, custom_objs=None):
     try:
-        model = tf.keras.models.load_model(path, custom_objects=custom_objs, compile=False)
+        # Menggunakan tf.device CPU untuk menghindari error CUDA di Space basic
+        with tf.device('/CPU:0'):
+            model = tf.keras.models.load_model(path, custom_objects=custom_objs, compile=False)
         print(f"✅ Berhasil load: {path}")
-        # Print input shape untuk debug
-        print(f"   Input Shape Model ini: {model.input_shape}")
         return model
     except Exception as e:
         print(f"❌ Gagal load {path}: {e}")
@@ -57,28 +57,25 @@ def preprocess_image(image, target_shape):
     if image is None: 
         return None
 
-    # 1. Ambil target ukuran (H, W) dari model
-    # Jika model.input_shape = (None, 48, 48, 3), kita ambil (48, 48)
-    target_h, target_w = target_shape[1], target_shape[2]
-    target_channels = target_shape[3]
-
-    # 2. Resize Gambar
+    # Ambil target ukuran (H, W) dari model jika tersedia, default 224
+    if target_shape and len(target_shape) >= 3:
+        target_h, target_w = target_shape[1], target_shape[2]
+    else:
+        target_h, target_w = 224, 224
+    
+    # Resize Gambar
     image_resized = image.resize((target_w, target_h))
     img_array = np.array(image_resized)
 
-    # 3. Handling Channel (Grayscale vs RGB)
-    # Jika model minta 3 channel (RGB) tapi gambar Grayscale
-    if target_channels == 3 and len(img_array.shape) == 2:
+    # Handling Channel (Grayscale vs RGB)
+    # Jika gambar cuma 2 dimensi (H, W), jadikan (H, W, 3)
+    if len(img_array.shape) == 2:
         img_array = np.stack((img_array,)*3, axis=-1)
     
-    # Jika model minta 1 channel (Grayscale) tapi gambar RGB
-    elif target_channels == 1 and len(img_array.shape) == 3:
-        img_array = np.mean(img_array, axis=-1, keepdims=True)
-
-    # 4. Normalisasi (1./255) - Sesuai Notebook VGG16 umumnya
+    # Normalisasi (1./255)
     img_array = img_array.astype('float32') / 255.0
     
-    # 5. Expand Dimension (Batch Size) -> (1, H, W, C)
+    # Expand Dimension (Batch Size) -> (1, H, W, C)
     img_array = np.expand_dims(img_array, axis=0)
     
     return img_array
@@ -90,26 +87,24 @@ def predict_expression(image):
     # --- PREDIKSI SKENARIO 1 ---
     if model_s1:
         try:
-            # Preprocess dinamis sesuai input shape model 1
             input_s1 = preprocess_image(image, model_s1.input_shape)
             pred_s1 = model_s1.predict(input_s1, verbose=0)[0]
             result_s1 = {LABELS[i]: float(pred_s1[i]) for i in range(len(LABELS))}
         except Exception as e:
             result_s1 = {f"Error: {str(e)}": 0.0}
     else:
-        result_s1 = {"Model 1 Tidak Ditemukan (Cek File)": 0.0}
+        result_s1 = {"Model 1 Tidak Ditemukan": 0.0}
 
     # --- PREDIKSI SKENARIO 2 ---
     if model_s2:
         try:
-            # Preprocess dinamis sesuai input shape model 2
             input_s2 = preprocess_image(image, model_s2.input_shape)
             pred_s2 = model_s2.predict(input_s2, verbose=0)[0]
             result_s2 = {LABELS[i]: float(pred_s2[i]) for i in range(len(LABELS))}
         except Exception as e:
             result_s2 = {f"Error: {str(e)}": 0.0}
     else:
-        result_s2 = {"Model 2 Tidak Ditemukan (Cek File)": 0.0}
+        result_s2 = {"Model 2 Tidak Ditemukan": 0.0}
         
     return result_s1, result_s2
 
@@ -121,8 +116,15 @@ custom_css = """
 .gradio-container { font-family: 'Inter', sans-serif !important; }
 h1 { text-align: center; background: -webkit-linear-gradient(45deg, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; font-size: 2.5rem; }
 .subtitle { text-align: center; color: #6b7280; margin-bottom: 2rem; }
+.footer {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 0.8rem;
+    color: #9ca3af;
+}
 """
 
+# Menggunakan theme standar Gradio 4.x yang stabil
 with gr.Blocks(theme=gr.themes.Soft(primary_hue="indigo", secondary_hue="zinc"), css=custom_css, title="Demo Sidang Skripsi") as demo:
     
     gr.Markdown("# ✨ Facial Expression Analysis ✨")
@@ -144,5 +146,9 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="indigo", secondary_hue="zinc"),
     
     submit_btn.click(fn=predict_expression, inputs=input_image, outputs=[output_s1, output_s2])
 
+# --- Footer ---
+    gr.Markdown("<div class='footer'>Developed by Qoid Rif'at | Universitas Trunojoyo Madura © 2025</div>")
+
+# Launch dengan ssr_mode=False untuk stabilitas di Spaces
 if __name__ == "__main__":
-    demo.launch()
+    demo.launch(ssr_mode=False)

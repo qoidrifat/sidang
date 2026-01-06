@@ -7,6 +7,8 @@ sdk: gradio
 sdk_version: 6.2.0
 app_file: app.py
 pinned: true
+thumbnail: >-
+  https://cdn-uploads.huggingface.co/production/uploads/675088c04af97b1321dc8030/0-rbP0MXmtQjWgX9Tpuuy.png
 ---
 
 # **Klasifikasi Ekspresi Wajah Menggunakan Transfer Learning Berbasis DeepFace Terintegrasi CNN**

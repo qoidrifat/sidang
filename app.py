@@ -144,36 +144,63 @@ h1 {
     font-weight: 500;
 }
 
-/* Styling untuk Tabel Skenario */
+/* Styling Modern untuk Tabel Skenario */
 .scenario-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     font-size: 0.95rem;
-    border-radius: 8px;
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 .scenario-table th {
-    background-color: #4f46e5;
+    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
     color: white;
-    padding: 12px;
+    padding: 14px 16px;
     text-align: left;
     font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-size: 0.8rem;
 }
 .scenario-table td {
-    padding: 10px 12px;
-    border-bottom: 1px solid #e2e8f0;
+    padding: 14px 16px;
+    border-bottom: 1px solid #f1f5f9;
     color: #475569;
+    vertical-align: middle;
 }
+
+/* Kolom Fitur (Kiri) - Modern & Elegan */
+.scenario-table td:first-child {
+    background-color: #f8fafc;
+    color: #312e81; /* Indigo gelap yang elegan */
+    font-weight: 600;
+    border-right: 2px solid #eef2ff;
+    width: 25%;
+}
+
 .scenario-table tr:last-child td {
     border-bottom: none;
 }
-.scenario-table tr:nth-child(even) {
-    background-color: #f1f5f9;
+.scenario-table tr:hover td {
+    background-color: #f8fafc;
 }
-.highlight-text {
+.scenario-table tr:hover td:first-child {
+    background-color: #e0e7ff; /* Highlight halus saat hover */
     color: #4f46e5;
+}
+
+/* Highlight Text yang Lebih Rapi */
+.highlight-text {
+    color: #4338ca;
     font-weight: 700;
+    background-color: #e0e7ff;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    display: inline-block;
 }
 """
 
@@ -208,29 +235,29 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="indigo", secondary_hue="zinc"),
                     <table class="scenario-table">
                         <thead>
                             <tr>
-                                <th width="20%">Fitur</th>
-                                <th width="40%">Skenario 1 (Baseline)</th>
-                                <th width="40%">Skenario 2 (Optimized)</th>
+                                <th>Fitur</th>
+                                <th>Skenario 1 (Baseline)</th>
+                                <th>Skenario 2 (Optimized)</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td><b>Arsitektur</b></td>
+                                <td>Arsitektur</td>
                                 <td>VGG16 (Frozen Weights)</td>
                                 <td>VGG16 (Fine-Tuned)</td>
                             </tr>
                             <tr>
-                                <td><b>Integrasi</b></td>
+                                <td>Integrasi</td>
                                 <td>-</td>
-                                <td class="highlight-text">SE-Block Attention</td>
+                                <td><span class="highlight-text">SE-Block Attention</span></td>
                             </tr>
                             <tr>
-                                <td><b>Training</b></td>
+                                <td>Training</td>
                                 <td>Frozen Layers</td>
                                 <td>Unfreeze Layer 11-19</td>
                             </tr>
                             <tr>
-                                <td><b>Optimasi</b></td>
+                                <td>Optimasi</td>
                                 <td>Tanpa Augmentasi</td>
                                 <td>Augmentasi + Label Smoothing</td>
                             </tr>

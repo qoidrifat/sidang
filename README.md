@@ -23,7 +23,8 @@ Sistem ini dirancang dengan antarmuka web interaktif yang komprehensif, memuat t
 
 | Peran | Nama / Gelar |
 | :---- | :---- |
-| **Mahasiswa** | **Qoid Rif'at** (NIM: 210411100160\) |
+| **Mahasiswa** | Qoid Rif'at |
+| **NIM** | 210411100160 |
 | **Instansi** | Universitas Trunojoyo Madura |
 | **Dospem 1** | Prof. Dr. Arif Muntasa, S.Si., M.T. |
 | **Dospem 2** | Fifin Ayu Mufarroha, M.Kom. |

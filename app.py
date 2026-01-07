@@ -283,15 +283,18 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="indigo", neutral_hue="slate"), 
                     with gr.Column():
                         gr.Markdown("#### A. Input Asli (48px)")
                         img_raw = np.random.randint(50, 200, (48, 48), dtype=np.uint8)
-                        gr.Image(value=img_raw, label="Grayscale Raw", height=200, type="numpy", interactive=False, show_download_button=False)
+                        # Fix: Hapus show_download_button=False
+                        gr.Image(value=img_raw, label="Grayscale Raw", height=200, type="numpy", interactive=False)
                     with gr.Column():
                         gr.Markdown("#### B. Resize & RGB (224px)")
                         img_resize = np.random.randint(50, 200, (224, 224, 3), dtype=np.uint8)
-                        gr.Image(value=img_resize, label="VGG16 Input", height=200, type="numpy", interactive=False, show_download_button=False)
+                        # Fix: Hapus show_download_button=False
+                        gr.Image(value=img_resize, label="VGG16 Input", height=200, type="numpy", interactive=False)
                     with gr.Column():
                         gr.Markdown("#### C. Augmentasi")
                         img_aug = np.rot90(img_resize)
-                        gr.Image(value=img_aug, label="Augmented", height=200, type="numpy", interactive=False, show_download_button=False)
+                        # Fix: Hapus show_download_button=False
+                        gr.Image(value=img_aug, label="Augmented", height=200, type="numpy", interactive=False)
 
                 gr.HTML("""
                 <div class="info-box">
@@ -384,7 +387,7 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="indigo", neutral_hue="slate"), 
             # FOOTER
             gr.HTML("""
             <div class="footer-container">
-                <p>Developed by <b>Qoid Rif'at</b> | 210411100160</p>
+                <p>Developed by <b>Qoid Rif'at</b> (NIM: 210411100160)</p>
                 <p>Program Studi Teknik Informatika - <b>Universitas Trunojoyo Madura</b> © 2025</p>
             </div>
             """)

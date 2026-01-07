@@ -11,53 +11,103 @@ thumbnail: >-
   https://cdn-uploads.huggingface.co/production/uploads/675088c04af97b1321dc8030/0-rbP0MXmtQjWgX9Tpuuy.png
 ---
 
-# **Klasifikasi Ekspresi Wajah Menggunakan Transfer Learning Berbasis DeepFace Terintegrasi CNN**
+# **🎓 Sistem Klasifikasi Ekspresi Wajah Terintegrasi (VGG16 \+ SE-Block)**
 
 ## **📌 Deskripsi Proyek**
 
-Repositori ini merupakan **demo interaktif** untuk kebutuhan Sidang Skripsi. Sistem ini mengimplementasikan model *Deep Learning* untuk mengenali 7 kelas ekspresi wajah (Marah, Jijik, Takut, Senang, Sedih, Terkejut, Netral) menggunakan dataset **FER-2013**.
+Repositori ini berisi **Sistem Demonstrasi Sidang Skripsi** yang mengimplementasikan pendekatan *Deep Learning* untuk pengenalan ekspresi wajah (Facial Expression Recognition) pada dataset **FER-2013**.
 
-Penelitian ini membandingkan kinerja dua skenario arsitektur berbasis **VGG16** (backbone dari framework DeepFace) untuk membuktikan efektivitas metode yang diusulkan.
+Sistem ini dirancang dengan antarmuka web interaktif yang komprehensif, memuat tidak hanya fitur prediksi, tetapi juga visualisasi dataset, alur preprocessing, dan analisis performa model secara mendalam. Inti penelitian ini membandingkan dua skenario arsitektur berbasis **VGG16** untuk membuktikan efektivitas integrasi **Squeeze-and-Excitation (SE) Block**.
 
-### **👥 Identitas Peneliti**
+## **👥 Identitas Peneliti**
 
-* **Nama:** Qoid Rif'at  
-* **NIM:** 210411100160  
-* **Instansi:** Universitas Trunojoyo Madura  
-* **Dospem 1:** Prof. Dr. Arif Muntasa, S.Si., M.T.  
-* **Dospem 2:** Fifin Ayu Mufarroha, M.Kom.
+| Peran | Nama / Gelar |
+| :---- | :---- |
+| **Mahasiswa** | **Qoid Rif'at** (NIM: 210411100160\) |
+| **Instansi** | Universitas Trunojoyo Madura |
+| **Dospem 1** | Prof. Dr. Arif Muntasa, S.Si., M.T. |
+| **Dospem 2** | Fifin Ayu Mufarroha, M.Kom. |
 
-## **🔬 Skenario Pengujian**
+## **🚀 Fitur Utama Sistem**
 
-Aplikasi ini memuat dua model secara bersamaan untuk perbandingan *side-by-side*:
+Aplikasi ini memiliki **5 Modul Utama** yang dapat diakses melalui Sidebar Navigasi:
+
+### **1\. 📂 Deskripsi Dataset**
+
+* Menampilkan sampel citra asli dari dataset **FER-2013**.  
+* Memvisualisasikan distribusi 7 kelas emosi: *Marah, Jijik, Takut, Senang, Sedih, Terkejut, Netral*.  
+* Menyajikan statistik dataset (resolusi asli 48x48 piksel, format grayscale).
+
+### **2\. ⚙️ Preprocessing Data Visualizer**
+
+* Mendemonstrasikan tahapan transformasi citra sebelum masuk ke model CNN.  
+* **Pipeline:** Citra Asli (48x48) ➔ Resize (224x224) ➔ Normalisasi ➔ Augmentasi (Rotasi, Flip).  
+* Penjelasan teknik *Label Smoothing* untuk mencegah overfitting.
+
+### **3\. 📊 Hasil & Parameter Klasifikasi**
+
+* Tabel komparasi parameter teknis antara **Skenario 1 (Baseline)** dan **Skenario 2 (Optimized)**.  
+* Ringkasan performa model terbaik berdasarkan metrik evaluasi (Akurasi, Presisi, Recall, F1-Score).
+
+### **4\. 📈 Implementasi & Grafik**
+
+* Visualisasi grafik kurva pembelajaran (*Learning Curves*) secara interaktif menggunakan matplotlib.  
+* Membandingkan akurasi *Training* vs *Validation* antar skenario untuk analisis *underfitting/overfitting*.
+
+### **5\. 🤖 Demo Prediksi (Real-time Inference)**
+
+* Modul pengujian langsung menggunakan citra wajah yang diunggah pengguna.  
+* Menampilkan hasil prediksi **Side-by-Side** antara model Baseline dan Optimized untuk menunjukkan peningkatan performa secara nyata.
+
+## **🔬 Metodologi Penelitian**
+
+Penelitian ini membandingkan dua skenario arsitektur utama:
 
 | Fitur | Skenario 1 (Baseline) | Skenario 2 (Optimized / Usulan) |
 | :---- | :---- | :---- |
 | **Arsitektur Dasar** | VGG16 (ImageNet Weights) | VGG16 (ImageNet Weights) |
-| **Strategi Training** | **Frozen** (Semua layer beku) | **Aggressive Fine-Tuning** (Unfreeze Layer 11-19) |
-| **Integrasi Khusus** | Tidak Ada | **Squeeze-and-Excitation (SE) Block** |
+| **Integrasi Khusus** | \- | **Squeeze-and-Excitation (SE) Block** |
+| **Strategi Training** | **Frozen** (Backbone Beku) | **Aggressive Fine-Tuning** (Unfreeze Layer 11-19) |
 | **Optimasi Data** | Tanpa Augmentasi | Augmentasi Geometris \+ Class Weights |
-| **Regularisasi** | Dropout Standar | Label Smoothing (0.1) |
+| **Loss Function** | Categorical Crossentropy | Crossentropy \+ **Label Smoothing (0.1)** |
 
-**Novelty:** Skenario 2 mengintegrasikan mekanisme atensi *SE-Block* untuk meningkatkan sensitivitas model terhadap fitur wajah penting (mata/mulut) dan melakukan *fine-tuning* pada layer konvolusi tingkat tinggi.
+**🌟 Novelty (Kebaruan):** Integrasi mekanisme atensi **SE-Block** yang disisipkan pada arsitektur VGG16 yang telah di-*fine-tune*, memungkinkan model untuk secara adaptif mengalibrasi ulang bobot fitur channel-wise, sehingga lebih sensitif terhadap fitur wajah mikro (mata, mulut) meskipun dengan data terbatas.
 
-## **🚀 Cara Penggunaan**
+## **🛠️ Instalasi & Penggunaan Lokal**
 
-1. **Upload Gambar:** Unggah foto wajah yang ingin diuji pada panel sebelah kiri. Pastikan wajah terlihat jelas.  
-2. **Klik Prediksi:** Tekan tombol "Prediksi Ekspresi".  
-3. **Analisis Hasil:**  
-   * Lihat output **Skenario 1**: Biasanya kurang akurat atau probabilitasnya rendah karena hanya menggunakan fitur generik.  
-   * Lihat output **Skenario 2**: Seharusnya memberikan prediksi yang lebih akurat dengan tingkat keyakinan (confidence) yang lebih tinggi.
+Jika Anda ingin menjalankan sistem ini di komputer lokal:
 
-## **🛠️ Dependensi (Requirements)**
+**1\. Clone Repository**
 
-Sistem ini dibangun menggunakan pustaka utama berikut:
+git clone \[https://huggingface.co/spaces/username/nama-repo\](https://huggingface.co/spaces/username/nama-repo)  
+cd nama-repo
 
-* tensorflow: Untuk memuat model .keras dan komputasi tensor.  
-* gradio: Untuk antarmuka web interaktif.  
-* numpy: Untuk manipulasi array citra.  
-* pillow: Untuk pemrosesan citra dasar.
+2\. Instal Dependensi  
+Pastikan Python 3.10 terinstal, lalu jalankan:  
+pip install \-r requirements.txt
 
-## **📄 Lisensi**
+3\. Siapkan Struktur Folder (Opsional)  
+Untuk fitur "Deskripsi Dataset" agar berfungsi optimal, buat struktur folder berikut:  
+/  
+├── app.py  
+├── requirements.txt  
+├── model\_scenario1.keras  
+├── best\_model\_scenario2.keras  
+└── dataset/  
+    ├── marah/      \# (isi dengan 5-10 sampel gambar .jpg)  
+    ├── senang/  
+    └── ... (kelas lainnya)
 
-Penelitian ini disusun untuk keperluan akademis di Universitas Trunojoyo Madura. Segala bentuk penggunaan ulang kode atau model harus mencantumkan sitasi yang sesuai.
+**4\. Jalankan Aplikasi**
+
+python app.py
+
+Akses aplikasi melalui browser di http://localhost:7860.
+
+## **📄 Lisensi & Kredit**
+
+Sistem ini dikembangkan sebagai bagian dari tugas akhir skripsi di **Program Studi Teknik Informatika, Universitas Trunojoyo Madura**.
+
+Kode sumber dan model yang disertakan dilisensikan di bawah **MIT License**. Penggunaan kembali untuk keperluan akademis diperbolehkan dengan mencantumkan sitasi yang sesuai.
+
+*© 2025 Qoid Rif'at. All Rights Reserved.*

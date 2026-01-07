@@ -43,22 +43,35 @@ def generate_plot(scenario_name, final_acc):
     train_acc = [0.3 + (final_acc - 0.3) * (1 - np.exp(-0.2 * i)) + random.uniform(-0.01, 0.01) for i in epochs]
     val_acc = [0.3 + (final_acc - 0.35) * (1 - np.exp(-0.2 * i)) + random.uniform(-0.02, 0.02) for i in epochs]
     
-    # Setup Dark Theme Plot
+    # Setup Modern Dark Theme Plot
     plt.style.use('dark_background')
     fig = plt.figure(figsize=(10, 5), dpi=100)
-    fig.patch.set_facecolor('#1f2937') # Match card background
     
+    # Warna Background Plot yang menyatu dengan Card
+    bg_color = '#1e293b' # Slate-800
+    fig.patch.set_facecolor(bg_color)
     ax = plt.gca()
-    ax.set_facecolor('#1f2937')
+    ax.set_facecolor(bg_color)
     
-    plt.plot(epochs, train_acc, '#6366f1', label='Training Acc', linewidth=2.5, alpha=0.9) # Indigo
-    plt.plot(epochs, val_acc, '#f43f5e', label='Validation Acc', linewidth=2.5, linestyle='--', alpha=0.9) # Rose
+    # Styling Garis
+    plt.plot(epochs, train_acc, '#818cf8', label='Training Accuracy', linewidth=3, alpha=0.9) # Indigo-400
+    plt.plot(epochs, val_acc, '#fb7185', label='Validation Accuracy', linewidth=3, linestyle='--', alpha=0.9) # Rose-400
     
-    plt.title(f'Grafik Akurasi - {scenario_name}', fontsize=12, color='white')
-    plt.xlabel('Epochs', fontsize=10, color='white')
-    plt.ylabel('Accuracy', fontsize=10, color='white')
-    plt.legend(facecolor='#374151', edgecolor='none', labelcolor='white')
-    plt.grid(True, alpha=0.1, color='white')
+    # Styling Axis & Grid
+    plt.title(f'Learning Curve: {scenario_name}', fontsize=14, color='white', fontweight='600', pad=20)
+    plt.xlabel('Epochs', fontsize=11, color='#cbd5e1', labelpad=10)
+    plt.ylabel('Accuracy', fontsize=11, color='#cbd5e1', labelpad=10)
+    
+    # Legend & Grid Minimalis
+    plt.legend(facecolor='#0f172a', edgecolor='none', labelcolor='#e2e8f0', loc='lower right', framealpha=0.8)
+    plt.grid(True, alpha=0.05, color='white', linestyle='-')
+    
+    # Hapus Border Chart
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_color('#475569')
+    ax.spines['bottom'].set_color('#475569')
+    
     plt.tight_layout()
     return fig
 
@@ -105,161 +118,186 @@ def predict_expression(image):
     return res_s1, res_s2
 
 # ==========================================
-# 3. NAVIGASI UI (LOGIKA BARU)
+# 3. NAVIGASI UI
 # ==========================================
 def change_page(page_id):
     # Update Visibilitas Halaman (Page 1-5)
     page_updates = [gr.update(visible=True if i == page_id else False) for i in range(1, 6)]
     
     # Update Status Tombol (Active/Inactive)
-    # Jika ID cocok, ubah variant ke 'primary' (menyala), jika tidak ke 'secondary' (mati)
     btn_updates = [gr.update(variant="primary" if i == page_id else "secondary") for i in range(1, 6)]
     
-    # Gabungkan semua update (5 Halaman + 5 Tombol)
     return page_updates + btn_updates
 
 # ==========================================
-# 4. ANTARMUKA (HUGGING FACE DARK THEME)
+# 4. ANTARMUKA (MODERN PROFESSIONAL THEME)
 # ==========================================
 custom_css = """
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
 
-/* --- GLOBAL DARK THEME --- */
+/* --- GLOBAL THEME: MIDNIGHT SLATE --- */
 body, .gradio-container {
-    background-color: #0b0f19 !important; /* HF Dark BG */
-    color: #e5e7eb !important;
-    font-family: 'Inter', sans-serif !important;
+    background-color: #0f172a !important; /* Slate 900 - Deep Background */
+    color: #f8fafc !important; /* Slate 50 - High Contrast Text */
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
 }
 
-/* --- SIDEBAR --- */
+/* --- SIDEBAR: GLASSMORPHISM --- */
 .sidebar-container {
-    background-color: #111827 !important; /* Darker Gray */
-    border-right: 1px solid #1f2937 !important;
-    padding: 25px 15px;
+    background-color: rgba(30, 41, 59, 0.4) !important; /* Slate 800 with opacity */
+    border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+    padding: 30px 20px;
     height: 100%;
+    backdrop-filter: blur(10px); /* Modern Blur Effect */
 }
+
+/* --- BUTTONS: MODERN PILL --- */
 .sidebar-btn {
     text-align: left !important;
-    margin-bottom: 10px !important;
+    margin-bottom: 12px !important;
     background: transparent !important;
-    color: #9ca3af !important; /* Muted text */
+    color: #94a3b8 !important; /* Slate 400 */
     border: 1px solid transparent !important;
     box-shadow: none !important;
     font-weight: 500;
-    border-radius: 8px !important;
-    transition: all 0.3s ease;
+    border-radius: 12px !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 0.95rem !important;
+    padding: 12px 16px !important;
 }
 .sidebar-btn:hover {
-    background-color: #1f2937 !important;
-    color: #ffffff !important;
-    padding-left: 15px !important;
-    border-color: #374151 !important;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    color: #e2e8f0 !important;
 }
-.sidebar-btn.primary { /* Tombol Aktif - Menyala */
-    background: linear-gradient(90deg, #4f46e5 0%, #3b82f6 100%) !important;
+.sidebar-btn.primary { /* Active State */
+    background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
     color: white !important;
-    border: none !important;
     font-weight: 600;
-    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4) !important;
-    padding-left: 15px !important; /* Sedikit menjorok ke kanan saat aktif */
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
-/* --- CONTENT CARDS --- */
+/* --- CARDS: ELEVATED DARK --- */
 .content-card {
-    background-color: #1f2937 !important; /* Card BG */
-    border: 1px solid #374151 !important;
-    border-radius: 16px;
-    padding: 30px;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-    margin-bottom: 20px;
+    background-color: #1e293b !important; /* Slate 800 */
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-radius: 20px;
+    padding: 35px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+    margin-bottom: 24px;
 }
 
-/* --- TYPOGRAPHY & ELEMENTS --- */
+/* --- TYPOGRAPHY --- */
 h1 {
     text-align: center;
     background: linear-gradient(to right, #818cf8, #c084fc);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     font-weight: 800;
-    font-size: 2.5rem;
-    margin-bottom: 30px;
+    font-size: 2.2rem;
+    margin-bottom: 35px;
+    letter-spacing: -0.02em;
 }
 h2 {
-    color: #f3f4f6 !important;
-    border-bottom: 2px solid #374151;
+    color: #f1f5f9 !important;
+    font-weight: 700;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding-bottom: 15px;
     margin-bottom: 25px;
+    font-size: 1.5rem;
 }
-h3, h4 { color: #e5e7eb !important; }
-p, li { color: #d1d5db !important; line-height: 1.6; }
+.subtitle-text {
+    font-size: 0.85rem; 
+    color: #64748b; 
+    text-transform: uppercase; 
+    letter-spacing: 0.05em; 
+    font-weight: 600;
+    margin-top: 5px;
+}
 
 /* --- INFO BOX & TABLES --- */
 .info-box {
-    background-color: #111827;
-    border: 1px solid #374151;
-    border-left: 4px solid #6366f1; /* Indigo Accent */
-    border-radius: 10px;
-    padding: 20px;
-    margin-top: 15px;
+    background-color: rgba(15, 23, 42, 0.6); /* Darker inner box */
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-left: 4px solid #6366f1;
+    border-radius: 12px;
+    padding: 24px;
+    margin-top: 20px;
 }
 table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    margin-top: 15px;
-    border-radius: 8px;
+    margin-top: 20px;
+    border-radius: 12px;
     overflow: hidden;
-    border: 1px solid #374151;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 th {
-    background-color: #374151;
-    color: #ffffff;
-    padding: 12px;
+    background-color: #334155; /* Slate 700 */
+    color: #e2e8f0;
+    padding: 16px;
     text-align: left;
     font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
 }
 td {
-    border-bottom: 1px solid #374151;
-    padding: 12px;
-    color: #d1d5db;
-    background-color: #1f2937;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 16px;
+    color: #cbd5e1;
+    background-color: rgba(30, 41, 59, 0.4);
 }
 tr:last-child td { border-bottom: none; }
 
 /* --- FOOTER --- */
 .footer-container {
     text-align: center;
-    margin-top: 50px;
-    padding-top: 20px;
-    border-top: 1px solid #374151;
-    color: #6b7280;
+    margin-top: 60px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    color: #64748b;
     font-size: 0.85rem;
 }
 .footer-container b { color: #818cf8; }
 
 /* --- GRADIO OVERRIDES --- */
-.block { border-color: #374151 !important; }
-label { color: #9ca3af !important; }
+.block { border-color: transparent !important; }
+label { color: #94a3b8 !important; font-weight: 500 !important; margin-bottom: 8px !important; }
 """
 
-# Gunakan tema Soft tapi kita override warnanya
 with gr.Blocks(theme=gr.themes.Soft(primary_hue="indigo", neutral_hue="slate"), css=custom_css, title="Sistem Skripsi FER") as demo:
     
-    gr.Markdown("# 🚀 Facial Expression Analysis System")
-    
+    # --- HEADER ---
+    with gr.Row():
+        with gr.Column(scale=1):
+             pass # Spacer
+        with gr.Column(scale=8):
+             gr.Markdown("# 🚀 Facial Expression Analysis System")
+        with gr.Column(scale=1):
+             pass # Spacer
+
     with gr.Row():
         # --- SIDEBAR ---
-        with gr.Column(scale=1, min_width=240, elem_classes=["sidebar-container"]) as sidebar:
-            gr.Markdown("### 🧭 NAVIGASI")
-            # Inisialisasi: Tombol 5 Primary (Aktif), Sisanya Secondary (Mati)
+        with gr.Column(scale=1, min_width=260, elem_classes=["sidebar-container"]) as sidebar:
+            gr.Markdown("### 🧭 MENU UTAMA")
+            
+            # Navigation Buttons
             btn_page1 = gr.Button("1. Deskripsi Dataset", variant="secondary", elem_classes=["sidebar-btn"])
             btn_page2 = gr.Button("2. Preprocessing Data", variant="secondary", elem_classes=["sidebar-btn"])
             btn_page3 = gr.Button("3. Hasil Klasifikasi", variant="secondary", elem_classes=["sidebar-btn"])
             btn_page4 = gr.Button("4. Implementasi & Grafik", variant="secondary", elem_classes=["sidebar-btn"])
             btn_page5 = gr.Button("5. Demo Prediksi Wajah", variant="primary", elem_classes=["sidebar-btn"])
             
-            gr.Markdown("---")
-            gr.Markdown("<div style='font-size: 0.8rem; color: #6b7280'>VGG16 Transfer Learning<br>+ SE-Block Attention</div>")
+            gr.Markdown("<div style='margin-top: 40px;'></div>") # Spacer
+            gr.Markdown("""
+            <div style='background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);'>
+                <div class='subtitle-text'>METODE</div>
+                <div style='color: #e2e8f0; margin-top: 5px; font-weight: 500;'>Transfer Learning VGG16</div>
+                <div style='color: #94a3b8; font-size: 0.8rem;'>+ Squeeze-Excitation Block</div>
+            </div>
+            """)
 
         # --- MAIN CONTENT ---
         with gr.Column(scale=4):
@@ -267,19 +305,19 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="indigo", neutral_hue="slate"), 
             # PAGE 1: Dataset
             with gr.Group(visible=False, elem_classes=["content-card"]) as page_1:
                 gr.Markdown("## 📂 1. Deskripsi Dataset FER-2013")
-                gr.Markdown("Dataset FER-2013 merupakan standar *benchmark* dalam pengenalan ekspresi wajah.")
+                gr.Markdown("Standar benchmark global untuk evaluasi pengenalan ekspresi wajah.")
                 
                 dataset_gallery = gr.Gallery(label="Preview Dataset", columns=5, height=350, object_fit="contain", interactive=False)
                 refresh_btn = gr.Button("🔄 Muat Sampel Dataset", variant="secondary", size="sm")
                 
                 gr.HTML("""
                 <div class="info-box">
-                    <h4>📝 Statistik Dataset:</h4>
-                    <ul>
-                        <li><b>Sumber:</b> Kaggle / ICML 2013</li>
-                        <li><b>Kelas:</b> 7 Emosi (Marah, Jijik, Takut, Senang, Sedih, Terkejut, Netral)</li>
-                        <li><b>Resolusi:</b> 48x48 Pixel (Grayscale)</li>
-                        <li><b>Format Input Model:</b> Resized to 224x224 (RGB)</li>
+                    <h4 style="margin-top: 0; color: #818cf8;">📝 Statistik Dataset</h4>
+                    <ul style="margin-bottom: 0;">
+                        <li><b>Sumber:</b> Kaggle / ICML 2013 Challenge</li>
+                        <li><b>Kelas Emosi:</b> 7 (Marah, Jijik, Takut, Senang, Sedih, Terkejut, Netral)</li>
+                        <li><b>Resolusi Asli:</b> 48x48 Pixel (Grayscale)</li>
+                        <li><b>Pipeline Input:</b> Resized to 224x224 (RGB)</li>
                     </ul>
                 </div>
                 """)
@@ -287,16 +325,16 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="indigo", neutral_hue="slate"), 
 
             # PAGE 2: Preprocessing
             with gr.Group(visible=False, elem_classes=["content-card"]) as page_2:
-                gr.Markdown("## ⚙️ 2. Alur Preprocessing Data")
+                gr.Markdown("## ⚙️ 2. Pipeline Preprocessing")
                 
                 with gr.Row():
                     with gr.Column():
                         gr.Markdown("#### A. Input Asli (48px)")
-                        img_raw = np.random.randint(50, 200, (48, 48), dtype=np.uint8)
+                        img_raw = np.random.randint(30, 180, (48, 48), dtype=np.uint8)
                         gr.Image(value=img_raw, label="Grayscale Raw", height=200, type="numpy", interactive=False)
                     with gr.Column():
                         gr.Markdown("#### B. Resize & RGB (224px)")
-                        img_resize = np.random.randint(50, 200, (224, 224, 3), dtype=np.uint8)
+                        img_resize = np.random.randint(30, 180, (224, 224, 3), dtype=np.uint8)
                         gr.Image(value=img_resize, label="VGG16 Input", height=200, type="numpy", interactive=False)
                     with gr.Column():
                         gr.Markdown("#### C. Augmentasi")
@@ -305,21 +343,21 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="indigo", neutral_hue="slate"), 
 
                 gr.HTML("""
                 <div class="info-box">
-                    <b>Teknik yang diterapkan:</b>
-                    <ul>
-                        <li><b>Rescaling (1./255):</b> Normalisasi nilai piksel.</li>
-                        <li><b>Label Smoothing (0.1):</b> Mencegah model terlalu percaya diri (*overconfident*).</li>
-                        <li><b>Augmentasi:</b> Rotasi, Zoom, Flip untuk variasi data latih.</li>
+                    <b style="color: #e2e8f0;">Teknik Optimasi Data:</b>
+                    <ul style="margin-top: 10px;">
+                        <li><span style="color:#818cf8">Rescaling (1./255):</span> Normalisasi intensitas piksel untuk konvergensi gradien yang lebih cepat.</li>
+                        <li><span style="color:#818cf8">Label Smoothing (0.1):</span> Mengurangi *overconfidence* model pada label hard-target.</li>
+                        <li><span style="color:#818cf8">Geometric Augmentation:</span> Rotasi, Zoom, dan Flip untuk variasi data latih.</li>
                     </ul>
                 </div>
                 """)
 
             # PAGE 3: Hasil
             with gr.Group(visible=False, elem_classes=["content-card"]) as page_3:
-                gr.Markdown("## 📊 3. Hasil & Parameter Model")
+                gr.Markdown("## 📊 3. Hasil & Parameter Eksperimen")
                 
                 gr.HTML("""
-                <h3>🔬 Perbandingan Skenario</h3>
+                <h3>🔬 Perbandingan Konfigurasi Model</h3>
                 <table>
                     <tr>
                         <th width="30%">Parameter</th>
@@ -328,39 +366,39 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="indigo", neutral_hue="slate"), 
                     </tr>
                     <tr>
                         <td><b>Optimizer</b></td>
-                        <td>Adam (LR: 0.001)</td>
-                        <td>Adam (LR: 0.0001)</td>
+                        <td>Adam (LR: 1e-3)</td>
+                        <td>Adam (LR: 1e-4)</td>
                     </tr>
                     <tr>
-                        <td><b>Strategi</b></td>
+                        <td><b>Training Strategy</b></td>
                         <td>Frozen Backbone</td>
-                        <td><span style="color:#818cf8; font-weight:bold;">Fine-Tuning (Layer 11-19)</span></td>
+                        <td><span style="color:#818cf8; font-weight:bold; background: rgba(99, 102, 241, 0.1); padding: 4px 8px; border-radius: 4px;">Aggressive Fine-Tuning</span></td>
                     </tr>
                     <tr>
-                        <td><b>Integrasi</b></td>
+                        <td><b>Arsitektur Tambahan</b></td>
                         <td>-</td>
-                        <td><b>SE-Block Attention</b></td>
+                        <td><b>Squeeze-and-Excitation (SE-Block)</b></td>
                     </tr>
                 </table>
                 
-                <div class="info-box" style="border-left-color: #10b981;">
-                    <h3 style="color: #34d399 !important;">🏆 Kesimpulan Terbaik</h3>
-                    <p><b>Skenario 2</b> menunjukkan performa superior dengan akurasi validasi <b>66.9%</b>.</p>
-                    <p>Integrasi <i>SE-Block</i> berhasil meningkatkan fokus model pada area mata dan mulut yang krusial untuk ekspresi wajah.</p>
+                <div class="info-box" style="border-left-color: #10b981; background: rgba(16, 185, 129, 0.05);">
+                    <h3 style="color: #34d399 !important; margin-top: 0;">🏆 Kesimpulan Model Terbaik</h3>
+                    <p><b>Skenario 2 (Optimized)</b> terpilih sebagai model terbaik dengan akurasi validasi <b>66.9%</b>.</p>
+                    <p style="margin-bottom: 0;">Mekanisme atensi <i>SE-Block</i> terbukti efektif dalam memfokuskan model pada fitur wajah mikro (mata, mulut) yang krusial untuk klasifikasi emosi.</p>
                 </div>
                 """)
 
             # PAGE 4: Grafik
             with gr.Group(visible=False, elem_classes=["content-card"]) as page_4:
-                gr.Markdown("## 📈 4. Grafik Performa Pelatihan")
+                gr.Markdown("## 📈 4. Analisis Grafik Pelatihan")
                 
-                load_graph_btn = gr.Button("Tampilkan Grafik", variant="primary")
+                load_graph_btn = gr.Button("Tampilkan Visualisasi Grafik", variant="primary")
                 
                 with gr.Row():
                     with gr.Column():
-                        plot1 = gr.Plot(label="Grafik Skenario 1")
+                        plot1 = gr.Plot(label="Learning Curve: Baseline")
                     with gr.Column():
-                        plot2 = gr.Plot(label="Grafik Skenario 2")
+                        plot2 = gr.Plot(label="Learning Curve: Optimized")
                 
                 load_graph_btn.click(
                     lambda: (generate_plot("Skenario 1 (Frozen)", 0.51), generate_plot("Skenario 2 (Fine-Tuned)", 0.67)),
@@ -370,23 +408,24 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="indigo", neutral_hue="slate"), 
 
             # PAGE 5: Demo
             with gr.Group(visible=True, elem_classes=["content-card"]) as page_5:
-                gr.Markdown("## 🤖 5. Demo Prediksi Langsung")
-                gr.Markdown("Uji kehandalan model Skenario 2 (Optimized) dibandingkan Baseline.")
+                gr.Markdown("## 🤖 5. Demo Prediksi Real-Time")
+                gr.Markdown("Pengujian langsung model pada data baru (Inference).")
                 
                 with gr.Row():
                     with gr.Column(scale=1):
-                        input_image = gr.Image(type="pil", label="Input Wajah", sources=["upload", "clipboard", "webcam"], height=320)
-                        submit_demo = gr.Button("🚀 Analisis Wajah", variant="primary")
-                        clear_demo = gr.Button("Hapus", variant="secondary")
+                        input_image = gr.Image(type="pil", label="Input Citra Wajah", sources=["upload", "clipboard", "webcam"], height=320)
+                        with gr.Row():
+                            clear_demo = gr.Button("Hapus", variant="secondary")
+                            submit_demo = gr.Button("🚀 Analisis Wajah", variant="primary")
 
                     with gr.Column(scale=2):
                         with gr.Row():
                             with gr.Column():
-                                gr.Markdown("#### Skenario 1 (Baseline) ❄️")
-                                out_s1 = gr.Label(num_top_classes=4, label="Confidence")
+                                gr.Markdown("#### ❄️ Skenario 1 (Baseline)")
+                                out_s1 = gr.Label(num_top_classes=4, label="Confidence Score")
                             with gr.Column():
-                                gr.Markdown("#### Skenario 2 (Optimized) 🔥")
-                                out_s2 = gr.Label(num_top_classes=4, label="Confidence")
+                                gr.Markdown("#### 🔥 Skenario 2 (Optimized)")
+                                out_s2 = gr.Label(num_top_classes=4, label="Confidence Score")
                 
                 submit_demo.click(fn=predict_expression, inputs=input_image, outputs=[out_s1, out_s2])
                 clear_demo.click(lambda: (None, None, None), outputs=[input_image, out_s1, out_s2])
@@ -394,13 +433,12 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="indigo", neutral_hue="slate"), 
             # FOOTER
             gr.HTML("""
             <div class="footer-container">
-                <p>Developed by <b>Qoid Rif'at</b> (NIM: 210411100160)</p>
+                <p>Developed by <b>Qoid Rif'at</b> | 210411100160 </p>
                 <p>Program Studi Teknik Informatika - <b>Universitas Trunojoyo Madura</b> © 2025</p>
             </div>
             """)
 
-    # Logic Navigasi: Outputkan 5 Halaman + 5 Tombol
-    # Daftar komponen yang akan diupdate: [Page1..Page5, Btn1..Btn5]
+    # Navigation Logic
     all_outputs = [page_1, page_2, page_3, page_4, page_5, 
                    btn_page1, btn_page2, btn_page3, btn_page4, btn_page5]
     

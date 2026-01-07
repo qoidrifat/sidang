@@ -105,10 +105,18 @@ def predict_expression(image):
     return res_s1, res_s2
 
 # ==========================================
-# 3. NAVIGASI UI
+# 3. NAVIGASI UI (LOGIKA BARU)
 # ==========================================
 def change_page(page_id):
-    return [gr.update(visible=True if i == page_id else False) for i in range(1, 6)]
+    # Update Visibilitas Halaman (Page 1-5)
+    page_updates = [gr.update(visible=True if i == page_id else False) for i in range(1, 6)]
+    
+    # Update Status Tombol (Active/Inactive)
+    # Jika ID cocok, ubah variant ke 'primary' (menyala), jika tidak ke 'secondary' (mati)
+    btn_updates = [gr.update(variant="primary" if i == page_id else "secondary") for i in range(1, 6)]
+    
+    # Gabungkan semua update (5 Halaman + 5 Tombol)
+    return page_updates + btn_updates
 
 # ==========================================
 # 4. ANTARMUKA (HUGGING FACE DARK THEME)
@@ -147,12 +155,13 @@ body, .gradio-container {
     padding-left: 15px !important;
     border-color: #374151 !important;
 }
-.sidebar-btn.primary { /* Tombol Aktif */
+.sidebar-btn.primary { /* Tombol Aktif - Menyala */
     background: linear-gradient(90deg, #4f46e5 0%, #3b82f6 100%) !important;
     color: white !important;
     border: none !important;
     font-weight: 600;
     box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4) !important;
+    padding-left: 15px !important; /* Sedikit menjorok ke kanan saat aktif */
 }
 
 /* --- CONTENT CARDS --- */
@@ -242,11 +251,12 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="indigo", neutral_hue="slate"), 
         # --- SIDEBAR ---
         with gr.Column(scale=1, min_width=240, elem_classes=["sidebar-container"]) as sidebar:
             gr.Markdown("### 🧭 NAVIGASI")
-            btn_page1 = gr.Button("1. Deskripsi Dataset", elem_classes=["sidebar-btn"])
-            btn_page2 = gr.Button("2. Preprocessing Data", elem_classes=["sidebar-btn"])
-            btn_page3 = gr.Button("3. Hasil Klasifikasi", elem_classes=["sidebar-btn"])
-            btn_page4 = gr.Button("4. Implementasi & Grafik", elem_classes=["sidebar-btn"])
-            btn_page5 = gr.Button("5. Demo Prediksi Wajah", elem_classes=["sidebar-btn", "primary"])
+            # Inisialisasi: Tombol 5 Primary (Aktif), Sisanya Secondary (Mati)
+            btn_page1 = gr.Button("1. Deskripsi Dataset", variant="secondary", elem_classes=["sidebar-btn"])
+            btn_page2 = gr.Button("2. Preprocessing Data", variant="secondary", elem_classes=["sidebar-btn"])
+            btn_page3 = gr.Button("3. Hasil Klasifikasi", variant="secondary", elem_classes=["sidebar-btn"])
+            btn_page4 = gr.Button("4. Implementasi & Grafik", variant="secondary", elem_classes=["sidebar-btn"])
+            btn_page5 = gr.Button("5. Demo Prediksi Wajah", variant="primary", elem_classes=["sidebar-btn"])
             
             gr.Markdown("---")
             gr.Markdown("<div style='font-size: 0.8rem; color: #6b7280'>VGG16 Transfer Learning<br>+ SE-Block Attention</div>")
@@ -283,17 +293,14 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="indigo", neutral_hue="slate"), 
                     with gr.Column():
                         gr.Markdown("#### A. Input Asli (48px)")
                         img_raw = np.random.randint(50, 200, (48, 48), dtype=np.uint8)
-                        # Fix: Hapus show_download_button=False
                         gr.Image(value=img_raw, label="Grayscale Raw", height=200, type="numpy", interactive=False)
                     with gr.Column():
                         gr.Markdown("#### B. Resize & RGB (224px)")
                         img_resize = np.random.randint(50, 200, (224, 224, 3), dtype=np.uint8)
-                        # Fix: Hapus show_download_button=False
                         gr.Image(value=img_resize, label="VGG16 Input", height=200, type="numpy", interactive=False)
                     with gr.Column():
                         gr.Markdown("#### C. Augmentasi")
                         img_aug = np.rot90(img_resize)
-                        # Fix: Hapus show_download_button=False
                         gr.Image(value=img_aug, label="Augmented", height=200, type="numpy", interactive=False)
 
                 gr.HTML("""
@@ -392,13 +399,16 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="indigo", neutral_hue="slate"), 
             </div>
             """)
 
-    # Logic
-    pages = [page_1, page_2, page_3, page_4, page_5]
-    btn_page1.click(lambda: change_page(1), outputs=pages)
-    btn_page2.click(lambda: change_page(2), outputs=pages)
-    btn_page3.click(lambda: change_page(3), outputs=pages)
-    btn_page4.click(lambda: change_page(4), outputs=pages)
-    btn_page5.click(lambda: change_page(5), outputs=pages)
+    # Logic Navigasi: Outputkan 5 Halaman + 5 Tombol
+    # Daftar komponen yang akan diupdate: [Page1..Page5, Btn1..Btn5]
+    all_outputs = [page_1, page_2, page_3, page_4, page_5, 
+                   btn_page1, btn_page2, btn_page3, btn_page4, btn_page5]
+    
+    btn_page1.click(lambda: change_page(1), outputs=all_outputs)
+    btn_page2.click(lambda: change_page(2), outputs=all_outputs)
+    btn_page3.click(lambda: change_page(3), outputs=all_outputs)
+    btn_page4.click(lambda: change_page(4), outputs=all_outputs)
+    btn_page5.click(lambda: change_page(5), outputs=all_outputs)
 
 if __name__ == "__main__":
     demo.launch(ssr_mode=False)

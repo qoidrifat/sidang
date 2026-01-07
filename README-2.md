@@ -1,6 +1,17 @@
-## **title: Facial Expression Analysis System (VGG16 \+ SE-Block) emoji: 🚀 colorFrom: indigo colorTo: slate sdk: gradio sdk\_version: 4.44.1 app\_file: app.py pinned: false license: mit**
+---
+title: Sidang Skripsi
+emoji: 🦀
+colorFrom: blue
+colorTo: indigo
+sdk: gradio
+sdk_version: 6.2.0
+app_file: app.py
+pinned: true
+thumbnail: >-
+  https://cdn-uploads.huggingface.co/production/uploads/675088c04af97b1321dc8030/0-rbP0MXmtQjWgX9Tpuuy.png
+---
 
-# **🚀 Facial Expression Analysis System**
+# **Facial Expression Analysis System**
 
 ### **Transfer Learning VGG16 Terintegrasi Squeeze-and-Excitation (SE-Block)**
 

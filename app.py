@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import random
-from PIL import Image
+from PIL import Image, ImageOps
 
 # ==========================================
 # 1. KONFIGURASI SISTEM & UTILITAS
@@ -89,6 +89,33 @@ def get_dataset_preview():
                     gallery_data.append((img, class_name))
     return gallery_data
 
+# --- Helper: Fungsi Preprocessing Demo ---
+def process_preprocessing_demo(image):
+    """
+    Mengambil input gambar user dan mengembalikan 3 tahap preprocessing.
+    """
+    if image is None: 
+        return None, None, None
+    
+    # 1. Raw FER Style (Grayscale 48x48)
+    img_gray = image.convert('L') # Convert ke Grayscale
+    img_raw_48 = img_gray.resize((48, 48))
+    raw_array = np.array(img_raw_48)
+    
+    # 2. VGG16 Input (RGB 224x224)
+    img_rgb = image.convert('RGB')
+    img_224 = img_rgb.resize((224, 224))
+    input_array = np.array(img_224)
+    
+    # 3. Augmented Example
+    angle = random.choice([-20, -15, -10, 5, 10, 15, 20])
+    img_aug = img_224.rotate(angle)
+    if random.choice([True, False]):
+        img_aug = ImageOps.mirror(img_aug)
+    aug_array = np.array(img_aug)
+    
+    return raw_array, input_array, aug_array
+
 # ==========================================
 # 2. LOGIKA PREDIKSI
 # ==========================================
@@ -123,10 +150,8 @@ def predict_expression(image):
 def change_page(page_id):
     # Update Visibilitas Halaman (Page 1-5)
     page_updates = [gr.update(visible=True if i == page_id else False) for i in range(1, 6)]
-    
     # Update Status Tombol (Active/Inactive)
     btn_updates = [gr.update(variant="primary" if i == page_id else "secondary") for i in range(1, 6)]
-    
     return page_updates + btn_updates
 
 # ==========================================
@@ -137,54 +162,57 @@ custom_css = """
 
 /* --- GLOBAL THEME: MIDNIGHT SLATE --- */
 body, .gradio-container {
-    background-color: #0f172a !important; /* Slate 900 - Deep Background */
-    color: #f8fafc !important; /* Slate 50 - High Contrast Text */
+    background-color: #0f172a !important; /* Slate 900 */
+    color: #f8fafc !important; /* Slate 50 */
     font-family: 'Plus Jakarta Sans', sans-serif !important;
 }
 
-/* --- SIDEBAR: GLASSMORPHISM --- */
+/* --- SIDEBAR: FLOATING GLASS PANEL --- */
 .sidebar-container {
-    background-color: rgba(30, 41, 59, 0.4) !important; /* Slate 800 with opacity */
-    border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+    background-color: rgba(30, 41, 59, 0.6) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 32px !important; /* Super Rounded */
     padding: 30px 20px;
-    height: 100%;
-    backdrop-filter: blur(10px); /* Modern Blur Effect */
+    margin: 10px 0 !important; /* Memberi jarak vertikal agar terlihat floating */
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
 }
 
-/* --- BUTTONS: MODERN PILL --- */
+/* --- CONTENT CARDS: CURVED & SOFT --- */
+.content-card {
+    background-color: #1e293b !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-radius: 32px !important; /* Super Rounded untuk match sidebar */
+    padding: 40px;
+    box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.2);
+    margin-bottom: 24px;
+}
+
+/* --- BUTTONS: PILL SHAPE --- */
 .sidebar-btn {
     text-align: left !important;
     margin-bottom: 12px !important;
     background: transparent !important;
-    color: #94a3b8 !important; /* Slate 400 */
+    color: #94a3b8 !important;
     border: 1px solid transparent !important;
     box-shadow: none !important;
     font-weight: 500;
-    border-radius: 12px !important;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 50px !important; /* Pill Shape */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     font-size: 0.95rem !important;
-    padding: 12px 16px !important;
+    padding: 14px 24px !important; /* Lebih lega */
 }
 .sidebar-btn:hover {
-    background-color: rgba(255, 255, 255, 0.05) !important;
+    background-color: rgba(255, 255, 255, 0.08) !important;
     color: #e2e8f0 !important;
+    transform: translateX(5px); /* Efek geser sedikit saat hover */
 }
-.sidebar-btn.primary { /* Active State */
-    background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
+.sidebar-btn.primary {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
     color: white !important;
     font-weight: 600;
-    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
-
-/* --- CARDS: ELEVATED DARK --- */
-.content-card {
-    background-color: #1e293b !important; /* Slate 800 */
-    border: 1px solid rgba(255, 255, 255, 0.05) !important;
-    border-radius: 20px;
-    padding: 35px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
-    margin-bottom: 24px;
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4) !important;
+    border: none !important;
 }
 
 /* --- TYPOGRAPHY --- */
@@ -202,50 +230,50 @@ h2 {
     color: #f1f5f9 !important;
     font-weight: 700;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 15px;
-    margin-bottom: 25px;
-    font-size: 1.5rem;
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+    font-size: 1.6rem;
 }
 .subtitle-text {
-    font-size: 0.85rem; 
-    color: #64748b; 
+    font-size: 0.8rem; 
+    color: #94a3b8; 
     text-transform: uppercase; 
-    letter-spacing: 0.05em; 
-    font-weight: 600;
+    letter-spacing: 0.1em; 
+    font-weight: 700;
     margin-top: 5px;
 }
 
 /* --- INFO BOX & TABLES --- */
 .info-box {
-    background-color: rgba(15, 23, 42, 0.6); /* Darker inner box */
+    background-color: rgba(15, 23, 42, 0.6);
     border: 1px solid rgba(99, 102, 241, 0.2);
-    border-left: 4px solid #6366f1;
-    border-radius: 12px;
+    border-left: 5px solid #6366f1;
+    border-radius: 20px; /* Rounded corners */
     padding: 24px;
-    margin-top: 20px;
+    margin-top: 25px;
 }
 table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    margin-top: 20px;
-    border-radius: 12px;
+    margin-top: 25px;
+    border-radius: 20px; /* Rounded table */
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.05);
 }
 th {
-    background-color: #334155; /* Slate 700 */
+    background-color: #334155;
     color: #e2e8f0;
-    padding: 16px;
+    padding: 18px;
     text-align: left;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     letter-spacing: 0.05em;
 }
 td {
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 16px;
+    padding: 18px;
     color: #cbd5e1;
     background-color: rgba(30, 41, 59, 0.4);
 }
@@ -264,22 +292,21 @@ tr:last-child td { border-bottom: none; }
 
 /* --- GRADIO OVERRIDES --- */
 .block { border-color: transparent !important; }
-label { color: #94a3b8 !important; font-weight: 500 !important; margin-bottom: 8px !important; }
+label { color: #94a3b8 !important; font-weight: 600 !important; margin-bottom: 10px !important; }
 """
 
 with gr.Blocks(theme=gr.themes.Soft(primary_hue="indigo", neutral_hue="slate"), css=custom_css, title="Sistem Skripsi FER") as demo:
     
     # --- HEADER ---
     with gr.Row():
-        with gr.Column(scale=1):
-             pass # Spacer
+        with gr.Column(scale=1): pass
         with gr.Column(scale=8):
              gr.Markdown("# 🚀 Facial Expression Analysis System")
-        with gr.Column(scale=1):
-             pass # Spacer
+        with gr.Column(scale=1): pass
 
     with gr.Row():
         # --- SIDEBAR ---
+        # Note: min_width=260 memastikan sidebar cukup lebar untuk teks
         with gr.Column(scale=1, min_width=260, elem_classes=["sidebar-container"]) as sidebar:
             gr.Markdown("### 🧭 MENU UTAMA")
             
@@ -290,12 +317,12 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="indigo", neutral_hue="slate"), 
             btn_page4 = gr.Button("4. Implementasi & Grafik", variant="secondary", elem_classes=["sidebar-btn"])
             btn_page5 = gr.Button("5. Demo Prediksi Wajah", variant="primary", elem_classes=["sidebar-btn"])
             
-            gr.Markdown("<div style='margin-top: 40px;'></div>") # Spacer
+            gr.Markdown("<div style='margin-top: 40px;'></div>")
             gr.Markdown("""
-            <div style='background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);'>
+            <div style='background: rgba(255,255,255,0.03); padding: 20px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.05); text-align: center;'>
                 <div class='subtitle-text'>METODE</div>
-                <div style='color: #e2e8f0; margin-top: 5px; font-weight: 500;'>Transfer Learning VGG16</div>
-                <div style='color: #94a3b8; font-size: 0.8rem;'>+ Squeeze-Excitation Block</div>
+                <div style='color: #f1f5f9; margin-top: 8px; font-weight: 600; font-size: 0.95rem;'>Transfer Learning VGG16</div>
+                <div style='color: #94a3b8; font-size: 0.85rem; margin-top: 4px;'>+ SE-Block Attention</div>
             </div>
             """)
 
@@ -323,34 +350,47 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="indigo", neutral_hue="slate"), 
                 """)
                 refresh_btn.click(fn=get_dataset_preview, outputs=dataset_gallery)
 
-            # PAGE 2: Preprocessing
+            # PAGE 2: Preprocessing (INTERAKTIF)
             with gr.Group(visible=False, elem_classes=["content-card"]) as page_2:
-                gr.Markdown("## ⚙️ 2. Pipeline Preprocessing")
+                gr.Markdown("## ⚙️ 2. Visualisasi Pipeline Preprocessing")
+                gr.Markdown("Unggah sembarang citra untuk melihat transformasi data sebelum masuk ke model.")
                 
                 with gr.Row():
-                    with gr.Column():
-                        gr.Markdown("#### A. Input Asli (48px)")
-                        img_raw = np.random.randint(30, 180, (48, 48), dtype=np.uint8)
-                        gr.Image(value=img_raw, label="Grayscale Raw", height=200, type="numpy", interactive=False)
-                    with gr.Column():
-                        gr.Markdown("#### B. Resize & RGB (224px)")
-                        img_resize = np.random.randint(30, 180, (224, 224, 3), dtype=np.uint8)
-                        gr.Image(value=img_resize, label="VGG16 Input", height=200, type="numpy", interactive=False)
-                    with gr.Column():
-                        gr.Markdown("#### C. Augmentasi")
-                        img_aug = np.rot90(img_resize)
-                        gr.Image(value=img_aug, label="Augmented", height=200, type="numpy", interactive=False)
+                    # Input Section
+                    with gr.Column(scale=1):
+                        prep_input = gr.Image(label="Upload Citra Mentah", type="pil", height=280)
+                        prep_btn = gr.Button("🔄 Proses Preprocessing", variant="primary")
+                    
+                    # Output Section
+                    with gr.Column(scale=2):
+                        with gr.Row():
+                            with gr.Column():
+                                gr.Markdown("#### A. Raw FER-Style (48px)")
+                                out_raw = gr.Image(label="Grayscale 48x48", height=180, type="numpy", interactive=False)
+                            with gr.Column():
+                                gr.Markdown("#### B. VGG16 Input (224px)")
+                                out_res = gr.Image(label="RGB Resized", height=180, type="numpy", interactive=False)
+                            with gr.Column():
+                                gr.Markdown("#### C. Augmentasi")
+                                out_aug = gr.Image(label="Augmented", height=180, type="numpy", interactive=False)
 
                 gr.HTML("""
                 <div class="info-box">
-                    <b style="color: #e2e8f0;">Teknik Optimasi Data:</b>
+                    <b style="color: #e2e8f0;">Tahapan Preprocessing Otomatis:</b>
                     <ul style="margin-top: 10px;">
-                        <li><span style="color:#818cf8">Rescaling (1./255):</span> Normalisasi intensitas piksel untuk konvergensi gradien yang lebih cepat.</li>
-                        <li><span style="color:#818cf8">Label Smoothing (0.1):</span> Mengurangi *overconfidence* model pada label hard-target.</li>
-                        <li><span style="color:#818cf8">Geometric Augmentation:</span> Rotasi, Zoom, dan Flip untuk variasi data latih.</li>
+                        <li><span style="color:#818cf8">Tahap A (Raw):</span> Citra dikonversi ke Grayscale dan di-resize 48x48 (Meniru dataset FER-2013).</li>
+                        <li><span style="color:#818cf8">Tahap B (Input Model):</span> Citra diubah ke RGB dan di-resize 224x224 (Sesuai input layer VGG16).</li>
+                        <li><span style="color:#818cf8">Tahap C (Augmentasi):</span> Simulasi variasi geometri (Rotasi/Flip) untuk memperkaya data latih.</li>
                     </ul>
                 </div>
                 """)
+                
+                # Logic Tombol Preprocessing
+                prep_btn.click(
+                    fn=process_preprocessing_demo, 
+                    inputs=prep_input, 
+                    outputs=[out_raw, out_res, out_aug]
+                )
 
             # PAGE 3: Hasil
             with gr.Group(visible=False, elem_classes=["content-card"]) as page_3:
@@ -372,7 +412,7 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="indigo", neutral_hue="slate"), 
                     <tr>
                         <td><b>Training Strategy</b></td>
                         <td>Frozen Backbone</td>
-                        <td><span style="color:#818cf8; font-weight:bold; background: rgba(99, 102, 241, 0.1); padding: 4px 8px; border-radius: 4px;">Aggressive Fine-Tuning</span></td>
+                        <td><span style="color:#818cf8; font-weight:bold; background: rgba(99, 102, 241, 0.1); padding: 4px 12px; border-radius: 8px;">Aggressive Fine-Tuning</span></td>
                     </tr>
                     <tr>
                         <td><b>Arsitektur Tambahan</b></td>
@@ -433,7 +473,7 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="indigo", neutral_hue="slate"), 
             # FOOTER
             gr.HTML("""
             <div class="footer-container">
-                <p>Developed by <b>Qoid Rif'at</b> | 210411100160 </p>
+                <p>Developed by <b>Qoid Rif'at</b> (NIM: 210411100160)</p>
                 <p>Program Studi Teknik Informatika - <b>Universitas Trunojoyo Madura</b> © 2025</p>
             </div>
             """)

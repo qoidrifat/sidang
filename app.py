@@ -148,19 +148,17 @@ def predict_expression(image):
 # 3. NAVIGASI UI
 # ==========================================
 def change_page(page_id):
-    # Update Visibilitas Halaman (Page 1-5)
     page_updates = [gr.update(visible=True if i == page_id else False) for i in range(1, 6)]
-    # Update Status Tombol (Active/Inactive)
     btn_updates = [gr.update(variant="primary" if i == page_id else "secondary") for i in range(1, 6)]
     return page_updates + btn_updates
 
 # ==========================================
-# 4. ANTARMUKA (MODERN PROFESSIONAL THEME)
+# 4. ANTARMUKA (MODERN + RESPONSIVE)
 # ==========================================
 custom_css = """
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
 
-/* --- GLOBAL THEME: MIDNIGHT SLATE --- */
+/* --- GLOBAL THEME --- */
 body, .gradio-container {
     background-color: #0f172a !important; /* Slate 900 */
     color: #f8fafc !important; /* Slate 50 */
@@ -171,24 +169,24 @@ body, .gradio-container {
 .sidebar-container {
     background-color: rgba(30, 41, 59, 0.6) !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    border-radius: 32px !important; /* Super Rounded */
+    border-radius: 32px !important;
     padding: 30px 20px;
-    margin: 10px 0 !important; /* Memberi jarak vertikal agar terlihat floating */
+    margin: 10px 0 !important;
     backdrop-filter: blur(12px);
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
 }
 
-/* --- CONTENT CARDS: CURVED & SOFT --- */
+/* --- CONTENT CARDS --- */
 .content-card {
     background-color: #1e293b !important;
     border: 1px solid rgba(255, 255, 255, 0.05) !important;
-    border-radius: 32px !important; /* Super Rounded untuk match sidebar */
+    border-radius: 32px !important;
     padding: 40px;
     box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.2);
     margin-bottom: 24px;
 }
 
-/* --- BUTTONS: PILL SHAPE --- */
+/* --- BUTTONS --- */
 .sidebar-btn {
     text-align: left !important;
     margin-bottom: 12px !important;
@@ -197,15 +195,15 @@ body, .gradio-container {
     border: 1px solid transparent !important;
     box-shadow: none !important;
     font-weight: 500;
-    border-radius: 50px !important; /* Pill Shape */
+    border-radius: 50px !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     font-size: 0.95rem !important;
-    padding: 14px 24px !important; /* Lebih lega */
+    padding: 14px 24px !important;
 }
 .sidebar-btn:hover {
     background-color: rgba(255, 255, 255, 0.08) !important;
     color: #e2e8f0 !important;
-    transform: translateX(5px); /* Efek geser sedikit saat hover */
+    transform: translateX(5px);
 }
 .sidebar-btn.primary {
     background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
@@ -225,6 +223,7 @@ h1 {
     font-size: 2.2rem;
     margin-bottom: 35px;
     letter-spacing: -0.02em;
+    width: 100%;
 }
 h2 {
     color: #f1f5f9 !important;
@@ -248,7 +247,7 @@ h2 {
     background-color: rgba(15, 23, 42, 0.6);
     border: 1px solid rgba(99, 102, 241, 0.2);
     border-left: 5px solid #6366f1;
-    border-radius: 20px; /* Rounded corners */
+    border-radius: 20px;
     padding: 24px;
     margin-top: 25px;
 }
@@ -257,7 +256,7 @@ table {
     border-collapse: separate;
     border-spacing: 0;
     margin-top: 25px;
-    border-radius: 20px; /* Rounded table */
+    border-radius: 20px;
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.05);
 }
@@ -291,6 +290,57 @@ tr:last-child td { border-bottom: none; }
 }
 .footer-container b { color: #818cf8; }
 
+/* --- RESPONSIVE MOBILE STYLES (@media) --- */
+@media (max-width: 768px) {
+    /* Container Padding */
+    .gradio-container {
+        padding: 10px !important;
+    }
+    
+    /* Header Responsive */
+    h1 {
+        font-size: 1.8rem !important;
+        margin-bottom: 20px !important;
+    }
+    h2 {
+        font-size: 1.4rem !important;
+    }
+    
+    /* Sidebar Stacking */
+    .sidebar-container {
+        margin: 0 0 20px 0 !important;
+        width: 100% !important;
+        border-right: none !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+        padding: 20px !important;
+    }
+    
+    /* Content Card Padding */
+    .content-card {
+        padding: 20px !important;
+        border-radius: 20px !important;
+    }
+    
+    /* Table Scrolling */
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    
+    /* Buttons */
+    .sidebar-btn {
+        padding: 10px 16px !important;
+        font-size: 0.9rem !important;
+    }
+    
+    /* Footer */
+    .footer-container {
+        margin-top: 30px;
+        font-size: 0.75rem;
+    }
+}
+
 /* --- GRADIO OVERRIDES --- */
 .block { border-color: transparent !important; }
 label { color: #94a3b8 !important; font-weight: 600 !important; margin-bottom: 10px !important; }
@@ -299,15 +349,12 @@ label { color: #94a3b8 !important; font-weight: 600 !important; margin-bottom: 1
 with gr.Blocks(theme=gr.themes.Soft(primary_hue="indigo", neutral_hue="slate"), css=custom_css, title="Sistem Skripsi FER") as demo:
     
     # --- HEADER ---
-    with gr.Row():
-        with gr.Column(scale=1): pass
-        with gr.Column(scale=8):
-             gr.Markdown("# 🚀 Facial Expression Analysis System")
-        with gr.Column(scale=1): pass
+    gr.Markdown("# 🚀 Facial Expression Analysis System")
 
     with gr.Row():
         # --- SIDEBAR ---
-        # Note: min_width=260 memastikan sidebar cukup lebar untuk teks
+        # Menggunakan min_width untuk memastikan sidebar tidak terlalu kecil di tablet
+        # Di mobile, CSS @media akan mengambil alih lebar menjadi 100%
         with gr.Column(scale=1, min_width=260, elem_classes=["sidebar-container"]) as sidebar:
             gr.Markdown("### 🧭 MENU UTAMA")
             
@@ -332,9 +379,10 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="indigo", neutral_hue="slate"), 
             
             # PAGE 1: Dataset
             with gr.Group(visible=False, elem_classes=["content-card"]) as page_1:
-                gr.Markdown("## 📂 1. Dataset FER-2013")
+                gr.Markdown("## 📂 1. Deskripsi Dataset FER-2013")
                 
-                dataset_gallery = gr.Gallery(label="Preview Dataset", columns=5, height=350, object_fit="contain", interactive=False)
+                # columns=[2, 3, 5] berarti: 2 kolom di HP, 3 di tablet, 5 di desktop
+                dataset_gallery = gr.Gallery(label="Preview Dataset", columns=[2, 3, 5], height=350, object_fit="contain", interactive=False)
                 refresh_btn = gr.Button("🔄 Muat Sampel Dataset", variant="secondary", size="sm")
                 
                 gr.HTML("""
@@ -350,10 +398,10 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="indigo", neutral_hue="slate"), 
                 """)
                 refresh_btn.click(fn=get_dataset_preview, outputs=dataset_gallery)
 
-            # PAGE 2: Preprocessing (INTERAKTIF)
+            # PAGE 2: Preprocessing
             with gr.Group(visible=False, elem_classes=["content-card"]) as page_2:
                 gr.Markdown("## ⚙️ 2. Visualisasi Pipeline Preprocessing")
-                gr.Markdown("Unggah sembarang citra untuk melihat transformasi data sebelum masuk ke model.")
+                gr.Markdown("Unggah sample citra untuk melihat transformasi data sebelum masuk ke model.")
                 
                 with gr.Row():
                     # Input Section
@@ -398,28 +446,30 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="indigo", neutral_hue="slate"), 
                 
                 gr.HTML("""
                 <h3>🔬 Perbandingan Konfigurasi Model</h3>
-                <table>
-                    <tr>
-                        <th width="30%">Parameter</th>
-                        <th width="35%">Skenario 1 (Baseline)</th>
-                        <th width="35%">Skenario 2 (Optimized)</th>
-                    </tr>
-                    <tr>
-                        <td><b>Optimizer</b></td>
-                        <td>Adam (LR: 1e-3)</td>
-                        <td>Adam (LR: 1e-4)</td>
-                    </tr>
-                    <tr>
-                        <td><b>Training Strategy</b></td>
-                        <td>Frozen Backbone</td>
-                        <td><span style="color:#818cf8; font-weight:bold; background: rgba(99, 102, 241, 0.1); padding: 4px 12px; border-radius: 8px;">Aggressive Fine-Tuning</span></td>
-                    </tr>
-                    <tr>
-                        <td><b>Arsitektur Tambahan</b></td>
-                        <td>-</td>
-                        <td><b>Squeeze-and-Excitation (SE-Block)</b></td>
-                    </tr>
-                </table>
+                <div style="overflow-x:auto;">
+                    <table>
+                        <tr>
+                            <th width="30%">Parameter</th>
+                            <th width="35%">Skenario 1 (Baseline)</th>
+                            <th width="35%">Skenario 2 (Optimized)</th>
+                        </tr>
+                        <tr>
+                            <td><b>Optimizer</b></td>
+                            <td>Adam (LR: 1e-3)</td>
+                            <td>Adam (LR: 1e-4)</td>
+                        </tr>
+                        <tr>
+                            <td><b>Training Strategy</b></td>
+                            <td>Frozen Backbone</td>
+                            <td><span style="color:#818cf8; font-weight:bold; background: rgba(99, 102, 241, 0.1); padding: 4px 12px; border-radius: 8px;">Aggressive Fine-Tuning</span></td>
+                        </tr>
+                        <tr>
+                            <td><b>Arsitektur Tambahan</b></td>
+                            <td>-</td>
+                            <td><b>Squeeze-and-Excitation (SE-Block)</b></td>
+                        </tr>
+                    </table>
+                </div>
                 
                 <div class="info-box" style="border-left-color: #10b981; background: rgba(16, 185, 129, 0.05);">
                     <h3 style="color: #34d399 !important; margin-top: 0;">🏆 Kesimpulan Model Terbaik</h3>
@@ -470,7 +520,7 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="indigo", neutral_hue="slate"), 
                 submit_demo.click(fn=predict_expression, inputs=input_image, outputs=[out_s1, out_s2])
                 clear_demo.click(lambda: (None, None, None), outputs=[input_image, out_s1, out_s2])
 
-    # --- FOOTER (Di Luar Kolom/Baris Utama agar Full Width) ---
+    # --- FOOTER ---
     gr.HTML("""
     <div class="footer-container">
         <p>Developed by <b>Qoid Rif'at</b> | 210411100160 </p>

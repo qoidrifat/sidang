@@ -1,5 +1,5 @@
 ---
-title: Facial Expression Analysis System (VGG16 + SE-Block)
+title: Sistem Analisis Ekspresi Wajah (VGG16 + SE-Block)
 emoji: 🚀
 colorFrom: indigo
 colorTo: slate
@@ -10,116 +10,118 @@ pinned: false
 license: mit
 ---
 
-# 🚀 Facial Expression Analysis System  
-### VGG16 Transfer Learning with Squeeze-and-Excitation (SE-Block)
+# 🚀 Sistem Analisis Ekspresi Wajah  
+### Transfer Learning VGG16 dengan Squeeze-and-Excitation (SE-Block)
 
-## 📌 Project Overview
+## 📌 Gambaran Umum Proyek
 
-This repository contains the implementation of an **undergraduate thesis project** focused on **facial expression classification** using the **FER-2013 dataset**.  
-The study evaluates and compares two deep learning scenarios based on the **VGG16** architecture to demonstrate the effectiveness of the proposed approach: **SE-Block integration combined with fine-tuning**.
+Repositori ini berisi implementasi **tugas akhir (skripsi)** yang berfokus pada **klasifikasi ekspresi wajah** menggunakan dataset **FER-2013**.  
+Penelitian ini membandingkan dua skenario arsitektur berbasis **VGG16** untuk membuktikan efektivitas metode yang diusulkan, yaitu **integrasi SE-Block yang dikombinasikan dengan fine-tuning**.
 
-The system is deployed as an **interactive web application** with a modern dark-themed UI, responsive design (mobile-friendly), and real-time prediction capabilities.
+Sistem dikembangkan dalam bentuk **aplikasi web interaktif** dengan tampilan **modern dark theme**, responsif (mobile-friendly), serta mendukung prediksi ekspresi wajah secara real-time.
 
-## 🎓 Researcher Information
+## 🎓 Identitas Peneliti
 
-| Role | Description |
-|------|------------|
-| **Student** | **Qoid Rif'at** |
-| **Student ID (NIM)** | 210411100160 |
-| **Institution** | Universitas Trunojoyo Madura |
-| **Supervisor I** | Prof. Dr. Arif Muntasa, S.Si., M.T. |
-| **Supervisor II** | Fifin Ayu Mufarroha, M.Kom. |
+| Peran | Keterangan |
+|------|-----------|
+| **Mahasiswa** | **Qoid Rif'at** |
+| **NIM** | 210411100160 |
+| **Fakultas** | Teknik |
+| **Prodi** | Teknik Informatika |
+| **Perguruan Tinggi** | Universitas Trunojoyo Madura |
+| **Dosen Pembimbing I** | Prof. Dr. Arif Muntasa, S.Si., M.T. |
+| **Dosen Pembimbing II** | Fifin Ayu Mufarroha, M.Kom. |
 
-## ✨ Application Features
+## ✨ Fitur Utama Aplikasi
 
-The web application is structured into five main modules accessible via a sidebar navigation menu:
+Aplikasi web ini terdiri dari lima modul utama yang dapat diakses melalui sidebar navigasi:
 
-1. **📂 Dataset Overview**  
-   - Visualization of sample images from the FER-2013 dataset.  
-   - Dataset statistics (7 emotion classes, 48×48 grayscale images).  
+1. **📂 Deskripsi Dataset**  
+   - Menampilkan contoh citra dari dataset FER-2013.  
+   - Informasi statistik dataset (7 kelas emosi, citra grayscale 48×48).  
 
-2. **⚙️ Interactive Data Preprocessing**  
-   - **User-uploaded image support** for preprocessing simulation.  
-   - Step-by-step visualization pipeline:  
-     *Grayscale Input → RGB Resize (224×224) → Augmentation (Rotation / Flip).*  
+2. **⚙️ Preprocessing Data Interaktif**  
+   - Mendukung unggah citra oleh pengguna untuk simulasi preprocessing.  
+   - Visualisasi tahapan preprocessing:  
+     *Citra Grayscale → Resize ke RGB (224×224) → Augmentasi (Rotasi / Flip).*  
 
-3. **📊 Classification Results**  
-   - Comparative table of technical parameters between **Scenario 1 (Baseline)** and **Scenario 2 (Optimized)**.  
-   - Model performance summary based on evaluation metrics.
+3. **📊 Hasil Klasifikasi**  
+   - Tabel perbandingan parameter teknis antara **Skenario 1 (Baseline)** dan **Skenario 2 (Optimasi / Usulan)**.  
+   - Ringkasan performa model berdasarkan metrik evaluasi.
 
-4. **📈 Training Analysis & Visualization**  
-   - Learning curves for training and validation accuracy.  
-   - Overfitting analysis and generalization discussion.
+4. **📈 Implementasi dan Visualisasi Pelatihan**  
+   - Grafik learning curve (akurasi training dan validation).  
+   - Analisis overfitting dan kemampuan generalisasi model.
 
-5. **🤖 Real-Time Prediction Demo**  
-   - Facial expression inference via webcam or image upload.  
-   - Side-by-side confidence score comparison between both models.
+5. **🤖 Demo Prediksi Real-Time**  
+   - Pengujian inferensi ekspresi wajah melalui webcam atau unggah gambar.  
+   - Perbandingan confidence score dari kedua model secara berdampingan.
 
-## 🛠️ Local Installation Guide
+## 🛠️ Panduan Instalasi (Menjalankan Secara Lokal)
 
-Follow the steps below to run the application locally on your machine.
+Ikuti langkah-langkah berikut untuk menjalankan aplikasi di komputer lokal (Laptop/PC).
 
-### 1. System Requirements
+### 1. Prasyarat Sistem
 
-- Python **3.10** or newer  
+- Python versi **3.10** atau lebih baru  
 - Git  
 
-### 2. Clone the Repository
+### 2. Clone Repository
 
 ```bash
 git clone https://huggingface.co/spaces/qoidrifat/sidang
 cd sidang
 ```
 
-### 3. Install Dependencies
+### 3. Instalasi Dependensi
 
-It is strongly recommended to use a virtual environment.
+Disarankan menggunakan virtual environment.
 
 ```bash
-# Create virtual environment
+# Membuat virtual environment
 python -m venv venv
 
-# Activate on Windows
+# Aktivasi (Windows)
 venv\Scripts\activate
 
-# Activate on macOS / Linux
+# Aktivasi (macOS / Linux)
 source venv/bin/activate
 
-# Install required packages
+# Instal library yang dibutuhkan
 pip install -r requirements.txt
 ```
 
-### 4. Run the Application
+### 4. Menjalankan Aplikasi
 
 ```bash
 python app.py
 ```
 
-Once the server is running, open the following URL in your browser:
+Setelah server berjalan, buka browser dan akses:
 ```
 http://127.0.0.1:7860
 ```
 
-## 🔬 Research Methodology
+## 🔬 Metodologi Penelitian
 
-This study compares two experimental scenarios as follows:
+Penelitian ini membandingkan dua skenario eksperimen sebagai berikut:
 
-| Aspect | Scenario 1 (Baseline) | Scenario 2 (Proposed / Optimized) |
-|------|----------------------|----------------------------------|
-| **Base Architecture** | VGG16 (ImageNet weights) | VGG16 (ImageNet weights) |
-| **SE-Block Integration** | No | **Yes** |
-| **Training Strategy** | Frozen backbone | Fine-tuning (Unfreeze layers 11–19) |
-| **Data Optimization** | None | Augmentation + Class Weights |
+| Aspek | Skenario 1 (Baseline) | Skenario 2 (Usulan / Optimasi) |
+|------|----------------------|-------------------------------|
+| **Arsitektur Dasar** | VGG16 (Bobot ImageNet) | VGG16 (Bobot ImageNet) |
+| **Integrasi SE-Block** | Tidak | **Ya** |
+| **Strategi Training** | Backbone dibekukan | Fine-tuning (Unfreeze layer 11–19) |
+| **Optimasi Data** | Tidak ada | Augmentasi + Class Weights |
 | **Loss Function** | Categorical Crossentropy | Crossentropy + **Label Smoothing (0.1)** |
 
-**Research Contribution:**  
-The integration of **Squeeze-and-Excitation Blocks** within a fine-tuned VGG16 architecture enables channel-wise feature recalibration. This approach improves sensitivity to subtle facial features (e.g., eyes and mouth), particularly under limited and imbalanced data conditions such as FER-2013.
+**Kontribusi Penelitian:**  
+Integrasi **Squeeze-and-Excitation Block** pada arsitektur VGG16 yang di-fine-tune memungkinkan model melakukan kalibrasi ulang bobot fitur secara channel-wise. Pendekatan ini meningkatkan sensitivitas model terhadap fitur mikro wajah (seperti mata dan mulut), khususnya pada kondisi dataset yang terbatas dan tidak seimbang seperti FER-2013.
 
-## 📄 License
+## 📄 Lisensi
 
-This project was developed as part of a **Bachelor’s Thesis** in the **Informatics Engineering Program, Universitas Trunojoyo Madura**.
+Proyek ini dikembangkan sebagai bagian dari **Tugas Akhir (Skripsi)** pada **Program Studi Teknik Informatika, Universitas Trunojoyo Madura**.
 
-The source code and accompanying models are released under the **MIT License**.  
-Reuse for academic and research purposes is permitted with proper citation.
+Kode sumber dan model yang disertakan dirilis di bawah **Lisensi MIT**.  
+Penggunaan ulang untuk keperluan akademik dan penelitian diperbolehkan dengan mencantumkan sitasi yang sesuai.
 
-© 2025 Qoid Rif'at. All rights reserved.
+© 2025 Qoid Rif'at. Seluruh hak cipta dilindungi.

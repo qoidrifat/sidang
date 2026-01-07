@@ -1,14 +1,3 @@
----
-title: Sistem Analisis Ekspresi Wajah (VGG16 + SE-Block)
-emoji: 🚀
-colorFrom: indigo
-colorTo: slate
-sdk: gradio
-sdk_version: 4.44.1
-app_file: app.py
-pinned: false
-license: mit
----
 
 # 🚀 Sistem Analisis Ekspresi Wajah  
 ### Transfer Learning VGG16 dengan Squeeze-and-Excitation (SE-Block)

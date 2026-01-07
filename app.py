@@ -283,10 +283,11 @@ tr:last-child td { border-bottom: none; }
 .footer-container {
     text-align: center;
     margin-top: 60px;
-    padding-top: 24px;
+    padding: 20px;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
-    color: #64748b;
+    color: #94a3b8;
     font-size: 0.85rem;
+    width: 100%;
 }
 .footer-container b { color: #818cf8; }
 
@@ -331,8 +332,7 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="indigo", neutral_hue="slate"), 
             
             # PAGE 1: Dataset
             with gr.Group(visible=False, elem_classes=["content-card"]) as page_1:
-                gr.Markdown("## 📂 1. Deskripsi Dataset FER-2013")
-                gr.Markdown("Standar benchmark global untuk evaluasi pengenalan ekspresi wajah.")
+                gr.Markdown("## 📂 1. Dataset FER-2013")
                 
                 dataset_gallery = gr.Gallery(label="Preview Dataset", columns=5, height=350, object_fit="contain", interactive=False)
                 refresh_btn = gr.Button("🔄 Muat Sampel Dataset", variant="secondary", size="sm")
@@ -470,13 +470,13 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="indigo", neutral_hue="slate"), 
                 submit_demo.click(fn=predict_expression, inputs=input_image, outputs=[out_s1, out_s2])
                 clear_demo.click(lambda: (None, None, None), outputs=[input_image, out_s1, out_s2])
 
-            # FOOTER
-            gr.HTML("""
-            <div class="footer-container">
-                <p>Developed by <b>Qoid Rif'at</b> (NIM: 210411100160)</p>
-                <p>Program Studi Teknik Informatika - <b>Universitas Trunojoyo Madura</b> © 2025</p>
-            </div>
-            """)
+    # --- FOOTER (Di Luar Kolom/Baris Utama agar Full Width) ---
+    gr.HTML("""
+    <div class="footer-container">
+        <p>Developed by <b>Qoid Rif'at</b> | 210411100160 </p>
+        <p>Program Studi Teknik Informatika - <b>Universitas Trunojoyo Madura</b> © 2025</p>
+    </div>
+    """)
 
     # Navigation Logic
     all_outputs = [page_1, page_2, page_3, page_4, page_5, 

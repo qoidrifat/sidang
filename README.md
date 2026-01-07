@@ -1,114 +1,125 @@
 ---
-title: Sidang Skripsi
-emoji: 🦀
-colorFrom: blue
-colorTo: indigo
+title: Facial Expression Analysis System (VGG16 + SE-Block)
+emoji: 🚀
+colorFrom: indigo
+colorTo: slate
 sdk: gradio
-sdk_version: 6.2.0
+sdk_version: 4.44.1
 app_file: app.py
-pinned: true
-thumbnail: >-
-  https://cdn-uploads.huggingface.co/production/uploads/675088c04af97b1321dc8030/0-rbP0MXmtQjWgX9Tpuuy.png
+pinned: false
+license: mit
 ---
 
-# **🎓 Sistem Klasifikasi Ekspresi Wajah Terintegrasi (VGG16 \+ SE-Block)**
+# 🚀 Facial Expression Analysis System  
+### VGG16 Transfer Learning with Squeeze-and-Excitation (SE-Block)
 
-## **📌 Deskripsi Proyek**
+## 📌 Project Overview
 
-Repositori ini berisi **Sistem Demonstrasi Sidang Skripsi** yang mengimplementasikan pendekatan *Deep Learning* untuk pengenalan ekspresi wajah (Facial Expression Recognition) pada dataset **FER-2013**.
+This repository contains the implementation of an **undergraduate thesis project** focused on **facial expression classification** using the **FER-2013 dataset**.  
+The study evaluates and compares two deep learning scenarios based on the **VGG16** architecture to demonstrate the effectiveness of the proposed approach: **SE-Block integration combined with fine-tuning**.
 
-Sistem ini dirancang dengan antarmuka web interaktif yang komprehensif, memuat tidak hanya fitur prediksi, tetapi juga visualisasi dataset, alur preprocessing, dan analisis performa model secara mendalam. Inti penelitian ini membandingkan dua skenario arsitektur berbasis **VGG16** untuk membuktikan efektivitas integrasi **Squeeze-and-Excitation (SE) Block**.
+The system is deployed as an **interactive web application** with a modern dark-themed UI, responsive design (mobile-friendly), and real-time prediction capabilities.
 
-## **👥 Identitas Peneliti**
+## 🎓 Researcher Information
 
-| Peran | Nama / Gelar |
-| :---- | :---- |
-| **Mahasiswa** | Qoid Rif'at |
-| **NIM** | 210411100160 |
-| **Instansi** | Universitas Trunojoyo Madura |
-| **Dospem 1** | Prof. Dr. Arif Muntasa, S.Si., M.T. |
-| **Dospem 2** | Fifin Ayu Mufarroha, M.Kom. |
+| Role | Description |
+|------|------------|
+| **Student** | **Qoid Rif'at** |
+| **Student ID (NIM)** | 210411100160 |
+| **Institution** | Universitas Trunojoyo Madura |
+| **Supervisor I** | Prof. Dr. Arif Muntasa, S.Si., M.T. |
+| **Supervisor II** | Fifin Ayu Mufarroha, M.Kom. |
 
-## **🚀 Fitur Utama Sistem**
+## ✨ Application Features
 
-Aplikasi ini memiliki **5 Modul Utama** yang dapat diakses melalui Sidebar Navigasi:
+The web application is structured into five main modules accessible via a sidebar navigation menu:
 
-### **1\. 📂 Deskripsi Dataset**
+1. **📂 Dataset Overview**  
+   - Visualization of sample images from the FER-2013 dataset.  
+   - Dataset statistics (7 emotion classes, 48×48 grayscale images).  
 
-* Menampilkan sampel citra asli dari dataset **FER-2013**.  
-* Memvisualisasikan distribusi 7 kelas emosi: *Marah, Jijik, Takut, Senang, Sedih, Terkejut, Netral*.  
-* Menyajikan statistik dataset (resolusi asli 48x48 piksel, format grayscale).
+2. **⚙️ Interactive Data Preprocessing**  
+   - **User-uploaded image support** for preprocessing simulation.  
+   - Step-by-step visualization pipeline:  
+     *Grayscale Input → RGB Resize (224×224) → Augmentation (Rotation / Flip).*  
 
-### **2\. ⚙️ Preprocessing Data Visualizer**
+3. **📊 Classification Results**  
+   - Comparative table of technical parameters between **Scenario 1 (Baseline)** and **Scenario 2 (Optimized)**.  
+   - Model performance summary based on evaluation metrics.
 
-* Mendemonstrasikan tahapan transformasi citra sebelum masuk ke model CNN.  
-* **Pipeline:** Citra Asli (48x48) ➔ Resize (224x224) ➔ Normalisasi ➔ Augmentasi (Rotasi, Flip).  
-* Penjelasan teknik *Label Smoothing* untuk mencegah overfitting.
+4. **📈 Training Analysis & Visualization**  
+   - Learning curves for training and validation accuracy.  
+   - Overfitting analysis and generalization discussion.
 
-### **3\. 📊 Hasil & Parameter Klasifikasi**
+5. **🤖 Real-Time Prediction Demo**  
+   - Facial expression inference via webcam or image upload.  
+   - Side-by-side confidence score comparison between both models.
 
-* Tabel komparasi parameter teknis antara **Skenario 1 (Baseline)** dan **Skenario 2 (Optimized)**.  
-* Ringkasan performa model terbaik berdasarkan metrik evaluasi (Akurasi, Presisi, Recall, F1-Score).
+## 🛠️ Local Installation Guide
 
-### **4\. 📈 Implementasi & Grafik**
+Follow the steps below to run the application locally on your machine.
 
-* Visualisasi grafik kurva pembelajaran (*Learning Curves*) secara interaktif menggunakan matplotlib.  
-* Membandingkan akurasi *Training* vs *Validation* antar skenario untuk analisis *underfitting/overfitting*.
+### 1. System Requirements
 
-### **5\. 🤖 Demo Prediksi (Real-time Inference)**
+- Python **3.10** or newer  
+- Git  
 
-* Modul pengujian langsung menggunakan citra wajah yang diunggah pengguna.  
-* Menampilkan hasil prediksi **Side-by-Side** antara model Baseline dan Optimized untuk menunjukkan peningkatan performa secara nyata.
+### 2. Clone the Repository
 
-## **🔬 Metodologi Penelitian**
+```bash
+git clone https://huggingface.co/spaces/qoidrifat/sidang
+cd sidang
+```
 
-Penelitian ini membandingkan dua skenario arsitektur utama:
+### 3. Install Dependencies
 
-| Fitur | Skenario 1 (Baseline) | Skenario 2 (Optimized / Usulan) |
-| :---- | :---- | :---- |
-| **Arsitektur Dasar** | VGG16 (ImageNet Weights) | VGG16 (ImageNet Weights) |
-| **Integrasi Khusus** | \- | **Squeeze-and-Excitation (SE) Block** |
-| **Strategi Training** | **Frozen** (Backbone Beku) | **Aggressive Fine-Tuning** (Unfreeze Layer 11-19) |
-| **Optimasi Data** | Tanpa Augmentasi | Augmentasi Geometris \+ Class Weights |
-| **Loss Function** | Categorical Crossentropy | Crossentropy \+ **Label Smoothing (0.1)** |
+It is strongly recommended to use a virtual environment.
 
-**🌟 Novelty (Kebaruan):** Integrasi mekanisme atensi **SE-Block** yang disisipkan pada arsitektur VGG16 yang telah di-*fine-tune*, memungkinkan model untuk secara adaptif mengalibrasi ulang bobot fitur channel-wise, sehingga lebih sensitif terhadap fitur wajah mikro (mata, mulut) meskipun dengan data terbatas.
+```bash
+# Create virtual environment
+python -m venv venv
 
-## **🛠️ Instalasi & Penggunaan Lokal**
+# Activate on Windows
+venv\Scripts\activate
 
-Jika Anda ingin menjalankan sistem ini di komputer lokal:
+# Activate on macOS / Linux
+source venv/bin/activate
 
-**1\. Clone Repository**
+# Install required packages
+pip install -r requirements.txt
+```
 
-git clone \[https://huggingface.co/spaces/username/nama-repo\](https://huggingface.co/spaces/username/nama-repo)  
-cd nama-repo
+### 4. Run the Application
 
-2\. Instal Dependensi  
-Pastikan Python 3.10 terinstal, lalu jalankan:  
-pip install \-r requirements.txt
-
-3\. Siapkan Struktur Folder (Opsional)  
-Untuk fitur "Deskripsi Dataset" agar berfungsi optimal, buat struktur folder berikut:  
-/  
-├── app.py  
-├── requirements.txt  
-├── model\_scenario1.keras  
-├── best\_model\_scenario2.keras  
-└── dataset/  
-    ├── marah/      \# (isi dengan 5-10 sampel gambar .jpg)  
-    ├── senang/  
-    └── ... (kelas lainnya)
-
-**4\. Jalankan Aplikasi**
-
+```bash
 python app.py
+```
 
-Akses aplikasi melalui browser di http://localhost:7860.
+Once the server is running, open the following URL in your browser:
+```
+http://127.0.0.1:7860
+```
 
-## **📄 Lisensi & Kredit**
+## 🔬 Research Methodology
 
-Sistem ini dikembangkan sebagai bagian dari tugas akhir skripsi di **Program Studi Teknik Informatika, Universitas Trunojoyo Madura**.
+This study compares two experimental scenarios as follows:
 
-Kode sumber dan model yang disertakan dilisensikan di bawah **MIT License**. Penggunaan kembali untuk keperluan akademis diperbolehkan dengan mencantumkan sitasi yang sesuai.
+| Aspect | Scenario 1 (Baseline) | Scenario 2 (Proposed / Optimized) |
+|------|----------------------|----------------------------------|
+| **Base Architecture** | VGG16 (ImageNet weights) | VGG16 (ImageNet weights) |
+| **SE-Block Integration** | No | **Yes** |
+| **Training Strategy** | Frozen backbone | Fine-tuning (Unfreeze layers 11–19) |
+| **Data Optimization** | None | Augmentation + Class Weights |
+| **Loss Function** | Categorical Crossentropy | Crossentropy + **Label Smoothing (0.1)** |
 
-*© 2025 Qoid Rif'at. All Rights Reserved.*
+**Research Contribution:**  
+The integration of **Squeeze-and-Excitation Blocks** within a fine-tuned VGG16 architecture enables channel-wise feature recalibration. This approach improves sensitivity to subtle facial features (e.g., eyes and mouth), particularly under limited and imbalanced data conditions such as FER-2013.
+
+## 📄 License
+
+This project was developed as part of a **Bachelor’s Thesis** in the **Informatics Engineering Program, Universitas Trunojoyo Madura**.
+
+The source code and accompanying models are released under the **MIT License**.  
+Reuse for academic and research purposes is permitted with proper citation.
+
+© 2025 Qoid Rif'at. All rights reserved.
